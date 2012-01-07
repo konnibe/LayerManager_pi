@@ -53,7 +53,7 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_menuRightClickDirTree->Append( m_menuItemDirTreeDelete );
 	
 	wxMenuItem* m_menuItemAddDir;
-	m_menuItemAddDir = new wxMenuItem( m_menuRightClickDirTree, wxID_ANY, wxString( _("MyMenuItem") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemAddDir = new wxMenuItem( m_menuRightClickDirTree, wxID_ANY, wxString( _("Add Directory") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuRightClickDirTree->Append( m_menuItemAddDir );
 	
 	
@@ -336,6 +336,7 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_treeCtrlDir->Connect( wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler( MainDialogBase::onTreeItemRightClickDirTree ), NULL, this );
 	m_treeCtrlDir->Connect( wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler( MainDialogBase::OnTreeSelectionChangedLayerTree ), NULL, this );
 	this->Connect( m_menuItemDirTreeDelete->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogBase::OnMenuSelectionDirTreeDelete ) );
+	this->Connect( m_menuItemAddDir->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogBase::OnMenuSelectionAddDir ) );
 	m_treeCtrlExplorer->Connect( wxEVT_COMMAND_TREE_BEGIN_DRAG, wxTreeEventHandler( MainDialogBase::OnTreeBeginDragExplorer ), NULL, this );
 	m_treeCtrlTrash->Connect( wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler( MainDialogBase::OnItemRightClickPaperbag ), NULL, this );
 	this->Connect( m_menuItemPaperbagRecover->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogBase::OnMenuItemSelectionPaperbagRecover ) );
@@ -366,6 +367,7 @@ MainDialogBase::~MainDialogBase()
 	m_treeCtrlDir->Disconnect( wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler( MainDialogBase::onTreeItemRightClickDirTree ), NULL, this );
 	m_treeCtrlDir->Disconnect( wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler( MainDialogBase::OnTreeSelectionChangedLayerTree ), NULL, this );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogBase::OnMenuSelectionDirTreeDelete ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogBase::OnMenuSelectionAddDir ) );
 	m_treeCtrlExplorer->Disconnect( wxEVT_COMMAND_TREE_BEGIN_DRAG, wxTreeEventHandler( MainDialogBase::OnTreeBeginDragExplorer ), NULL, this );
 	m_treeCtrlTrash->Disconnect( wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler( MainDialogBase::OnItemRightClickPaperbag ), NULL, this );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogBase::OnMenuItemSelectionPaperbagRecover ) );

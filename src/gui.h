@@ -91,6 +91,7 @@ class MainDialogBase : public wxDialog
 		virtual void onTreeItemRightClickDirTree( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnTreeSelectionChangedLayerTree( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnMenuSelectionDirTreeDelete( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMenuSelectionAddDir( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnTreeBeginDragExplorer( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnItemRightClickPaperbag( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnMenuItemSelectionPaperbagRecover( wxCommandEvent& event ) { event.Skip(); }

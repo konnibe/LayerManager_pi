@@ -87,21 +87,60 @@
 class DnDFile : public wxFileDropTarget
 {
 public:
-    DnDFile(MainDialog* d, wxTreeCtrl *pOwner) { m_pOwner = pOwner; dialog = d;}
+    DnDFile(MainDialog* d, wxTreeCtrl *pOwner, wxTreeCtrl* pSender) { m_pOwner = pOwner; m_pSender = pSender; dialog = d;}
 
     virtual bool OnDropFiles(wxCoord x, wxCoord y,
                              const wxArrayString& filenames);
 
+	bool sortInTree(wxTreeCtrl* tree, wxCoord x, wxCoord y, const wxArrayString& filenames);
+
 private:
     wxTreeCtrl *m_pOwner;
+	wxTreeCtrl* m_pSender;
 	MainDialog* dialog;
 };
+
+bool DnDFile::sortInTree(wxTreeCtrl* tree, wxCoord x, wxCoord y, const wxArrayString& filenames)
+{
+	wxTreeItemId idparent;
+	wxTreeItemId prev = dialog->selectionDirTree;
+	wxTreeItemId iditem = tree->HitTest(wxPoint(x,y));
+
+	if(prev == iditem) return false;
+
+	if(dialog->getDirTreeItemData(iditem)->ind != MainDialog::DIR)
+	{
+		idparent = tree->GetItemParent(iditem);
+		wxFileName fn(dialog->getDirTreeItemData(iditem)->path);
+		iditem = tree->InsertItem(idparent,iditem,tree->GetItemText(prev),-1,-1,
+				new myTreeItemData(fn.GetPath() + wxString(wxFileName::GetPathSeparator()) +
+				tree->GetItemText(prev),dialog->getDirTreeItemData(prev)->ind));
+
+	}
+	else
+	{
+		idparent = iditem;;
+		wxString prevString = tree->GetItemText(prev);
+		wxFileName fn(dialog->getDirTreeItemData(iditem)->path);
+		wxMessageBox(fn.GetPath());
+		iditem = tree->InsertItem(idparent,0,prevString,-1,-1,
+					new myTreeItemData(fn.GetPath() + wxString(wxFileName::GetPathSeparator()) + prevString,
+										dialog->getDirTreeItemData(prev)->ind));
+
+	}
+
+	wxMessageBox(dialog->getDirTreeItemData(prev)->path+dialog->getDirTreeItemData(iditem)->path);
+	::wxRenameFile(dialog->getDirTreeItemData(prev)->path,dialog->getDirTreeItemData(iditem)->path);
+	tree->Delete(prev);
+	return true;
+}
 
 bool DnDFile::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 {
 	wxTreeItemId id	;
     size_t nFiles = filenames.GetCount();
-	
+	if( m_pSender == m_pOwner) return sortInTree(m_pOwner,x,y,filenames);
+
     for ( size_t n = 0; n < nFiles; n++ )
     {
 		wxFileName fn(filenames[n]);		
@@ -118,8 +157,10 @@ bool DnDFile::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 				elem->file = filenames[0];
 				elem->head = MainDialog::ROOT;
 				
-				m_pOwner->AddRoot(fn.GetFullName(),-1,-1,elem);				
+				m_pOwner->AddRoot(fn.GetFullName(),-1,-1,elem);
 			}
+			::wxRename(filenames[0],filenames[0]+_T("~"));
+			dialog->fillDirTree(dialog->m_treeCtrlDir,dialog->pHome_Locn,false);
 			dialog->appendXMLElement(&doc, m_pOwner,  m_pOwner->GetRootItem());
 			dialog->modified = true;
 		}
@@ -141,9 +182,17 @@ bool DnDFile::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 			links->file = filenames[n];
 			links->text = fn.GetName();	
 			dialog->modified = true;
+			
+			myTreeItemElements* data = dialog->getElementsItemData(dialog->m_treeCtrlLayerElements->GetRootItem());
+			wxFileName fn(data->file);
+			wxFileName fnfrom(filenames[n]);
+			wxString zz = fn.GetPath() + wxFileName::GetPathSeparator() + fnfrom.GetFullName();
+			if(!wxFile::Exists(zz))
+			{
+				bool t = ::wxCopyFile(filenames[n],zz);
+				dialog->fillDirTree(dialog->m_treeCtrlDir,dialog->pHome_Locn,false);
+			}
 		}
-		
-
     }
 	m_pOwner->ExpandAll();
     return true;
@@ -161,8 +210,9 @@ MainDialog::~MainDialog()
 
 void MainDialog::OnCloseDialog(wxCloseEvent& event)
 {
+	event.Skip();
 	parent->DeInit();
-//	event.Skip();
+
 }
 
 void MainDialog::OnOKClick(wxCommandEvent& event)
@@ -300,7 +350,8 @@ void MainDialog::OnInit(wxInitDialogEvent& init)
 
 	pExplorer_Locn  = _T("");
 
-	this->m_treeCtrlLayerElements->SetDropTarget(new DnDFile(this,m_treeCtrlLayerElements));
+	this->m_treeCtrlLayerElements->SetDropTarget(new DnDFile(this,m_treeCtrlLayerElements, this->m_treeCtrlDir));
+	this->m_treeCtrlDir->SetDropTarget(new DnDFile(this,this->m_treeCtrlDir, this->m_treeCtrlDir));
 	this->m_textCtrlLabelDir->SetValue(pHome_Locn);
 	fillDirTree(this->m_treeCtrlDir,this->m_textCtrlLabelDir->GetValue(),false);	
 
@@ -507,13 +558,37 @@ void MainDialog::OnTreeItemActivatedDirTree( wxTreeEvent& event )
 	}	
 }
 
+void MainDialog::OnMenuSelectionAddDir( wxCommandEvent& event )
+{
+	wxString dir;
+
+	myTreeItemData* data = this->getDirTreeItemData(this->m_treeCtrlDir->GetSelection());
+	if(data->ind != DIR)
+	{
+		wxFileName fn(data->path);
+		dir  = fn.GetPath();
+	}
+	else
+		dir = data->path;
+
+	dir += wxString(wxFileName::GetPathSeparator()) + _("Unnamed");
+	bool t = ::wxMkdir(dir);
+	this->fillDirTree(this->m_treeCtrlDir,this->m_textCtrlLabelDir->GetValue(),false);
+}
+
 void MainDialog::OnTreeEndLabelEditElements( wxTreeEvent& event )
 {
 	myTreeItemElements* data = this->getElementsItemData(event.GetItem());
 	switch(data->head)
 	{
 	case LINKS:
-					data->text = event.GetLabel();
+				{	data->text = event.GetLabel();
+					wxString temp = data->file;
+					wxFileName fn(data->file);
+					data->file = fn.GetPath() + wxFileName::GetPathSeparator() + data->text + _T(".") + fn.GetExt();
+					::wxRenameFile(temp,data->file);
+					fillDirTree(this->m_treeCtrlDir,m_textCtrlLabelDir->GetValue(),false);
+				}
 		break;
 	case ROUTE:
 	case ROUTEPOINT:
@@ -542,6 +617,7 @@ void MainDialog::OnTreeEndLabelEditElements( wxTreeEvent& event )
 		
 void MainDialog::OnTreeBeginnDragFile( wxTreeEvent& event )
 {
+	this->selectionDirTree = event.GetItem();
 	myTreeItemData* dat = getDirTreeItemData(event.GetItem());
 	if(dat->ind == DIR) return;
 
@@ -556,13 +632,13 @@ void MainDialog::OnTreeBeginnDragFile( wxTreeEvent& event )
 	{
 	    case wxDragCopy: /* copy the data */ break;
 	    case wxDragMove:
-			{ wxFileName fn(dat->path);
+/*			{ wxFileName fn(dat->path);
 				if(fn.GetExt() == _T("gpx"))
 				{
 					::wxRename(dat->path,dat->path+_T("~"));
 					fillDirTree(this->m_treeCtrlDir,pHome_Locn,false);
 				}
-			}
+			}*/
 			break;
 	    default:         /* do nothing */ break;
 	}
@@ -590,6 +666,7 @@ void MainDialog::OnTreeBeginDragExplorer( wxTreeEvent& event )
 
 void MainDialog::OnTreeSelectionChangedLayerTree( wxTreeEvent& event )
 {
+	this->selectionDirTree = event.GetItem();
 	myTreeItemData* d = getDirTreeItemData(event.GetItem());
 
 	if(d != NULL)
@@ -938,7 +1015,7 @@ wxTreeItemId MainDialog::recursiveWrite(wxTreeItemId id, TiXmlElement *elem, TiX
 										telem = new TiXmlElement("trkpt");
 										break;									
 								}
-								wxMessageBox(data->lat);
+
 								telem->SetAttribute("lat",data->lat.mb_str());
 								telem->SetAttribute("lon",data->lon.mb_str());								
 								elem->LinkEndChild(telem);

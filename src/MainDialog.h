@@ -42,6 +42,7 @@ class MainDialog : public MainDialogBase
 		void OnMenuItemSelectionPaperbagRecover( wxCommandEvent& event );
 		void OnMenuItemPaperbagEmpty( wxCommandEvent& event );
 		void OnItemActivatedIconsList( wxListEvent& event );
+		void OnMenuSelectionAddDir( wxCommandEvent& event );
 		void OnInit( wxInitDialogEvent& event );
 	public:
 		/** Constructor */
@@ -54,6 +55,8 @@ class MainDialog : public MainDialogBase
 
 		
 		void appendXMLElement(TiXmlNode* node, wxTreeCtrl* tree, wxTreeItemId root, unsigned int indent = 0);
+		void fillDirTree(wxTreeCtrl * tree,wxString str, bool tilde);
+
 		myTreeItemElements* getElementsItemData(wxTreeItemId id);	
 		myTreeItemData* getDirTreeItemData(wxTreeItemId id);		
 
@@ -67,11 +70,12 @@ class MainDialog : public MainDialogBase
 		wxImageList* imageList;
 		wxArrayString* imageDescription;
 		wxArrayString* imageName;
+
+		wxTreeItemId selectionDirTree, selElementsTree;
 		
 private:	
 		void createImageList();
 		wxImage makeImage(const char *icon[]);
-		void fillDirTree(wxTreeCtrl * tree,wxString str, bool tilde);
 		void fillDirRecursive(wxTreeCtrl * tree,wxTreeItemId root, wxString str, bool tilde);
 		wxTreeItemId findTreeItem(wxTreeCtrl* pTreeCtrl, const wxTreeItemId& root, const wxString& text, bool bCaseSensitive, bool bExactMatch);
 		void writeXml();
@@ -79,7 +83,7 @@ private:
 		void addElement(TiXmlElement *root, const char* key, const char* label);
 		void checkLinks(TiXmlElement *elem, wxTreeItemId item);
 		void setSettingsPage(myTreeItemElements* elem);
-		int MainDialog::getImageName(wxString str);
+		int getImageName(wxString str);
 
 		LayerManager_pi* parent;
 		int sashPosition;
