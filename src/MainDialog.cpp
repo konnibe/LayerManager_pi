@@ -140,6 +140,7 @@ bool DnDFile::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 {
 	wxTreeItemId id	;
 	
+	//dialog->m_treeCtrlDir->SelectItem(dialog->oldDirTreeItem);
     size_t nFiles = filenames.GetCount();
 	if( m_pSender == m_pOwner) return sortInTree(m_pOwner,x,y,filenames);
 
@@ -182,7 +183,13 @@ bool DnDFile::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 			m_pOwner->AppendItem(id,fn.GetName(),40,-1,links);
 			links->head = MainDialog::LINKS;
 			wxURI uri(_T("file://")+filenames[n]);
+#ifdef __WXMSW__			
 			links->file = _T("file:///")+uri.GetPath();
+#endif
+#ifdef __WXGTK__
+			links->file = _T("file://")+uri.GetPath();			
+#endif
+			
 			links->text = fn.GetName();	
 			dialog->modified = true;
 			
@@ -462,7 +469,7 @@ void MainDialog::OnMenuSeletionAddText( wxCommandEvent& event )
 	elem->head = LINKS;
 	elem->text = n.GetFullName();
 	elem->file = path;
-	m_treeCtrlLayerElements->AppendItem(m_treeCtrlLayerElements->GetSelection(),n.GetFullName(),-1,-1,elem);
+	m_treeCtrlLayerElements->AppendItem(m_treeCtrlLayerElements->GetSelection(),n.GetFullName(),40,-1,elem);
 	
 	this->m_treeCtrlLayerElements->ExpandAll();
 	this->m_textCtrlEditText->SetFocus();
@@ -597,12 +604,13 @@ void MainDialog::OnTreeItemActivatedDirTree( wxTreeEvent& event )
 	if(it)
 	{
 		wxString str = ((myTreeItemData*)it)->path;
-		wxFileName fn(str);
-		str.Replace(_T("file:///"),_T(""));
-		wxFileType* open = wxTheMimeTypesManager->GetFileTypeFromExtension(fn.GetExt());
-		wxString cmd = open->GetOpenCommand(str);
-		cmd.Replace(_("/"),wxString(wxFileName::GetPathSeparator()));
-		wxExecute(cmd);
+		//wxFileName fn(str);
+		//str.Replace(_T("file:///"),_T(""));
+		//wxFileType* open = wxTheMimeTypesManager->GetFileTypeFromExtension(fn.GetExt());
+		//wxString cmd = open->GetOpenCommand(str);
+		//cmd.Replace(_("/"),wxString(wxFileName::GetPathSeparator()));
+		//wxExecute(cmd);
+		::wxLaunchDefaultBrowser(str);
 	}	
 }
 
@@ -674,6 +682,7 @@ void MainDialog::OnTreeEndLabelEditElements( wxTreeEvent& event )
 void MainDialog::OnTreeBeginnDragFile( wxTreeEvent& event )
 {
         this->m_treeCtrlDir->SelectItem(this->oldDirTreeItem);
+	//this->oldDirTreeItem = this->m_treeCtrlDir->GetNextVisible(this->oldDirTreeItem);
 //wxMessageBox(this->m_treeCtrlDir->GetItemText(this->oldDirTreeItem));
 	this->selectionDirTree = event.GetItem();
 	myTreeItemData* dat = getDirTreeItemData(event.GetItem());
@@ -700,6 +709,9 @@ void MainDialog::OnTreeBeginnDragFile( wxTreeEvent& event )
 			break;
 	    default:         /* do nothing */ break;
 	}
+	wxTreeItemId id = this->findTreeItem(this->m_treeCtrlDir, this->m_treeCtrlDir->GetRootItem(), 
+					     this->m_treeCtrlLayerElements->GetItemText(this->m_treeCtrlLayerElements->GetRootItem()),false, true);
+	this->m_treeCtrlDir->SelectItem(id);
 }
 
 void MainDialog::OnTreeBeginDragExplorer( wxTreeEvent& event )
@@ -734,7 +746,7 @@ void MainDialog::OnTreeSelectionChangedLayerTree( wxTreeEvent& event )
 
 	if(d != NULL)
 	{
-		if((!m_treeCtrlLayerElements->IsEmpty() && modified))
+	/*	if((!m_treeCtrlLayerElements->IsEmpty() && modified))
 		{
 			wxString fileElements = getElementsItemData(this->m_treeCtrlLayerElements->GetRootItem())->file;
 			if(wxFile::Exists(fileElements))
@@ -744,7 +756,8 @@ void MainDialog::OnTreeSelectionChangedLayerTree( wxTreeEvent& event )
 				}			
 
 		}
-
+*/
+		OnButtonClickSaveLayerElements( event );
 		this->m_treeCtrlLayerElements->DeleteAllItems();
 		wxFileName fn(d->path);
 		if(!(fn.GetExt() == _T("gpx"))) return;
