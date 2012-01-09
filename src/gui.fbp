@@ -376,7 +376,7 @@
                                 <property name="resize">Resizable</property>
                                 <property name="row"></property>
                                 <property name="sashgravity">0.0</property>
-                                <property name="sashpos">200</property>
+                                <property name="sashpos">220</property>
                                 <property name="sashsize">-1</property>
                                 <property name="show">1</property>
                                 <property name="size"></property>
@@ -744,8 +744,8 @@
                                                                         <event name="OnKillFocus"></event>
                                                                         <event name="OnLeaveWindow"></event>
                                                                         <event name="OnLeftDClick"></event>
-                                                                        <event name="OnLeftDown"></event>
-                                                                        <event name="OnLeftUp"></event>
+                                                                        <event name="OnLeftDown">OnLeftDownDirTree</event>
+                                                                        <event name="OnLeftUp">OnLeftUpDirTree</event>
                                                                         <event name="OnMiddleDClick"></event>
                                                                         <event name="OnMiddleDown"></event>
                                                                         <event name="OnMiddleUp"></event>

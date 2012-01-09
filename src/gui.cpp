@@ -315,7 +315,7 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel91->SetSizer( bSizer121 );
 	m_panel91->Layout();
 	bSizer121->Fit( m_panel91 );
-	m_splitter1->SplitVertically( m_panel61, m_panel91, 200 );
+	m_splitter1->SplitVertically( m_panel61, m_panel91, 220 );
 	bSizer2->Add( m_splitter1, 1, wxEXPAND, 5 );
 	
 	mainSizer->Add( bSizer2, 1, wxEXPAND, 5 );
@@ -341,6 +341,8 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( MainDialogBase::OnInit ) );
 	m_bpButtonDir->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogBase::OnButtonClickLayerDir ), NULL, this );
 	m_notebook1->Connect( wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler( MainDialogBase::OnNotebook1PageChanged ), NULL, this );
+	m_treeCtrlDir->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( MainDialogBase::OnLeftDownDirTree ), NULL, this );
+	m_treeCtrlDir->Connect( wxEVT_LEFT_UP, wxMouseEventHandler( MainDialogBase::OnLeftUpDirTree ), NULL, this );
 	m_treeCtrlDir->Connect( wxEVT_COMMAND_TREE_BEGIN_DRAG, wxTreeEventHandler( MainDialogBase::OnTreeBeginnDragFile ), NULL, this );
 	m_treeCtrlDir->Connect( wxEVT_COMMAND_TREE_END_LABEL_EDIT, wxTreeEventHandler( MainDialogBase::OnTreeEndLabelEditDirTree ), NULL, this );
 	m_treeCtrlDir->Connect( wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler( MainDialogBase::OnTreeItemActivatedDirTree ), NULL, this );
@@ -373,6 +375,8 @@ MainDialogBase::~MainDialogBase()
 	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( MainDialogBase::OnInit ) );
 	m_bpButtonDir->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogBase::OnButtonClickLayerDir ), NULL, this );
 	m_notebook1->Disconnect( wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler( MainDialogBase::OnNotebook1PageChanged ), NULL, this );
+	m_treeCtrlDir->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( MainDialogBase::OnLeftDownDirTree ), NULL, this );
+	m_treeCtrlDir->Disconnect( wxEVT_LEFT_UP, wxMouseEventHandler( MainDialogBase::OnLeftUpDirTree ), NULL, this );
 	m_treeCtrlDir->Disconnect( wxEVT_COMMAND_TREE_BEGIN_DRAG, wxTreeEventHandler( MainDialogBase::OnTreeBeginnDragFile ), NULL, this );
 	m_treeCtrlDir->Disconnect( wxEVT_COMMAND_TREE_END_LABEL_EDIT, wxTreeEventHandler( MainDialogBase::OnTreeEndLabelEditDirTree ), NULL, this );
 	m_treeCtrlDir->Disconnect( wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler( MainDialogBase::OnTreeItemActivatedDirTree ), NULL, this );

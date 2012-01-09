@@ -366,7 +366,7 @@ void MainDialog::OnInit(wxInitDialogEvent& init)
 	this->m_textCtrlLabelDir->SetValue(pHome_Locn);
 	fillDirTree(this->m_treeCtrlDir,this->m_textCtrlLabelDir->GetValue(),false);	
 
-	this->sashPosition = 200;
+	this->sashPosition = 220;
 	this->m_splitter31->SetSashPosition(this->m_notebook2->GetClientRect().y-30);
 }
 

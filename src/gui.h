@@ -86,6 +86,8 @@ class MainDialogBase : public wxDialog
 		virtual void OnInit( wxInitDialogEvent& event ) { event.Skip(); }
 		virtual void OnButtonClickLayerDir( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnNotebook1PageChanged( wxNotebookEvent& event ) { event.Skip(); }
+		virtual void OnLeftDownDirTree( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnLeftUpDirTree( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnTreeBeginnDragFile( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnTreeEndLabelEditDirTree( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnTreeItemActivatedDirTree( wxTreeEvent& event ) { event.Skip(); }
@@ -143,7 +145,7 @@ class MainDialogBase : public wxDialog
 		
 		void m_splitter1OnIdle( wxIdleEvent& )
 		{
-			m_splitter1->SetSashPosition( 200 );
+			m_splitter1->SetSashPosition( 220 );
 			m_splitter1->Disconnect( wxEVT_IDLE, wxIdleEventHandler( MainDialogBase::m_splitter1OnIdle ), NULL, this );
 		}
 		
