@@ -80,10 +80,14 @@ SET(SRC_LAYERMANAGER
 	src/LayerManager_pi.h
 	src/gui.cpp
 	src/gui.h
-     	src/MainDialog.cpp
+    src/MainDialog.cpp
  	src/MainDialog.h
-     src/tinyxml/tinyxml.cpp
-     src/tinyxml/tinyxml.h
+    src/tinyxml/tinyxml.cpp
+    src/tinyxml/tinyxml.h
+	src/tinyxml/tinyxmlerror.cpp
+	src/tinyxml/tinyxmlparser.cpp
+	src/tinyxml/tinystr.cpp
+	src/tinyxml/tinystr.h    
 )
 
 

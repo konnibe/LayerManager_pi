@@ -43,6 +43,7 @@ class MainDialog : public MainDialogBase
 		void OnMenuItemPaperbagEmpty( wxCommandEvent& event );
 		void OnItemActivatedIconsList( wxListEvent& event );
 		void OnMenuSelectionAddDir( wxCommandEvent& event );
+		void OnListColClickSettings( wxListEvent& event );
 		void OnInit( wxInitDialogEvent& event );
 	public:
 		/** Constructor */
@@ -84,9 +85,11 @@ private:
 		void checkLinks(TiXmlElement *elem, wxTreeItemId item);
 		void setSettingsPage(myTreeItemElements* elem);
 		int getImageName(wxString str);
+		void showHideIconsList();
 
 		LayerManager_pi* parent;
 		int sashPosition;
+	    bool showIconsList;
 };
 
 class myTreeItemData : public wxTreeItemData

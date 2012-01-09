@@ -79,6 +79,7 @@
 #include <wx/dnd.h>
 #include "wx/stdpaths.h"
 #include <wx/imaglist.h>
+#include <wx/uri.h>
 
 #include "LayerManager_pi.h"
 
@@ -121,16 +122,16 @@ bool DnDFile::sortInTree(wxTreeCtrl* tree, wxCoord x, wxCoord y, const wxArraySt
 	{
 		idparent = iditem;;
 		wxString prevString = tree->GetItemText(prev);
-		wxFileName fn(dialog->getDirTreeItemData(iditem)->path);
-		wxMessageBox(fn.GetPath());
+
 		iditem = tree->InsertItem(idparent,0,prevString,-1,-1,
-					new myTreeItemData(fn.GetPath() + wxString(wxFileName::GetPathSeparator()) + prevString,
+					new myTreeItemData(dialog->getDirTreeItemData(iditem)->path + 
+										wxString(wxFileName::GetPathSeparator()) + prevString,
 										dialog->getDirTreeItemData(prev)->ind));
 
 	}
 
-	wxMessageBox(dialog->getDirTreeItemData(prev)->path+dialog->getDirTreeItemData(iditem)->path);
-	::wxRenameFile(dialog->getDirTreeItemData(prev)->path,dialog->getDirTreeItemData(iditem)->path);
+//	wxMessageBox(dialog->getDirTreeItemData(prev)->path+_T("\n")+dialog->getDirTreeItemData(iditem)->path);
+	bool t = ::wxRenameFile(dialog->getDirTreeItemData(prev)->path,dialog->getDirTreeItemData(iditem)->path);
 	tree->Delete(prev);
 	return true;
 }
@@ -179,7 +180,8 @@ bool DnDFile::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 			myTreeItemElements* links = new myTreeItemElements();
 			m_pOwner->AppendItem(id,fn.GetName(),40,-1,links);
 			links->head = MainDialog::LINKS;
-			links->file = filenames[n];
+			wxURI uri(_T("file://")+filenames[n]);
+			links->file = _T("file:///")+uri.GetPath();
 			links->text = fn.GetName();	
 			dialog->modified = true;
 			
@@ -293,7 +295,7 @@ void MainDialog::createImageList()
 
 	wxListItem col1;
 	col1.SetColumn(1);
-	col1.SetWidth(100);
+	col1.SetWidth(150);
 	col1.SetText(_("Description"));
 	this->m_listCtrlSettingsIcons->InsertColumn(1,col1);
 
@@ -308,11 +310,17 @@ void MainDialog::createImageList()
 
 void MainDialog::OnItemActivatedIconsList( wxListEvent& event )
 {
+	if(this->m_treeCtrlLayerElements->IsEmpty() && 
+		this->m_treeCtrlLayerElements->GetSelection() == (wxTreeItemId) 0 ) return;
+
 	modified = true;
+
 	this->m_treeCtrlLayerElements->SetItemImage(this->m_treeCtrlLayerElements->GetSelection(),
 		event.GetIndex());
 	this->getElementsItemData(this->m_treeCtrlLayerElements->GetSelection())->sym = 
 		imageName->Item(event.GetIndex());
+	this->m_bitmap1->SetBitmap(this->imageList->GetBitmap(event.GetIndex()));
+	this->m_staticText13->SetLabel(this->imageDescription->Item(event.GetIndex()));
 }
 
 wxImage MainDialog::makeImage(const char *icon[])
@@ -328,6 +336,9 @@ void MainDialog::OnInit(wxInitDialogEvent& init)
 	textModified = false;
 	textPath = wxEmptyString;
 	wxArrayString arr;
+	showIconsList = false;
+
+	this->m_treeCtrlDir->SelectItem(this->m_treeCtrlDir->GetRootItem());
 
 	createImageList();
 
@@ -356,6 +367,7 @@ void MainDialog::OnInit(wxInitDialogEvent& init)
 	fillDirTree(this->m_treeCtrlDir,this->m_textCtrlLabelDir->GetValue(),false);	
 
 	this->sashPosition = 200;
+	this->m_splitter31->SetSashPosition(this->m_notebook2->GetClientRect().y-30);
 }
 
 void MainDialog::OnItemRightClickPaperbag( wxTreeEvent& event )
@@ -476,6 +488,8 @@ void MainDialog::onTreeItemRightClickDirTree( wxTreeEvent& event )
 
 void MainDialog::OnButtonClickNewLayer( wxCommandEvent& event )
 {
+	wxString path;
+
 	if(modified)
 		writeXml();
 	if(textModified)
@@ -485,11 +499,32 @@ void MainDialog::OnButtonClickNewLayer( wxCommandEvent& event )
 	
 	this->m_treeCtrlLayerElements->DeleteAllItems();
 	myTreeItemElements* elem = new myTreeItemElements();
-	elem->file = this->m_textCtrlLabelDir->GetValue() + wxFileName::GetPathSeparator() + _("New Layer.gpx");
+	wxString str = _("New Layer");
+	int ind = this->getDirTreeItemData(this->m_treeCtrlDir->GetSelection())->ind;
+	if(ind == DIR)
+		path = this->getDirTreeItemData(this->m_treeCtrlDir->GetSelection())->path;
+	else
+	{
+		wxFileName fn( this->getDirTreeItemData(this->m_treeCtrlDir->GetSelection())->path );
+		path = fn.GetPath();
+	}
+	if(wxFile::Exists(path + wxString(wxFileName::GetPathSeparator()) + str + _T(".gpx")))
+	{
+		wxArrayString dummy;
+		int i = wxDir::GetAllFiles(path,&dummy);
+		if(i > 0) str = wxString::Format(_T("%s(%i).gpx"),str,i);
+	}
+	else
+		str += _T(".gpx");
+
+	elem->file = path + wxFileName::GetPathSeparator() + str;
 	elem->head = ROOT;
     wxFileName fn(elem->file);
-	this->m_treeCtrlLayerElements->AddRoot(fn.GetFullName(),-1,-1,elem);
-	modified = true;
+	this->m_treeCtrlLayerElements->AddRoot(fn.GetFullName(),0,-1,elem);
+	this->writeXml();			
+	fillDirTree(this->m_treeCtrlDir,m_textCtrlLabelDir->GetValue(),false);
+	wxTreeItemId id = this->findTreeItem(this->m_treeCtrlDir,this->m_treeCtrlDir->GetRootItem(),str,false,true);
+	this->m_treeCtrlDir->SelectItem(id);
 }
 
 void MainDialog::OnButtonClickLayerDir( wxCommandEvent& event )
@@ -521,8 +556,18 @@ void MainDialog::OnMenuSelectionDirTreeDelete( wxCommandEvent& event )
 	if(wxMessageBox(_T("Are You sure ?"),_T("Information"),wxYES|wxNO) == wxYES)
 	{
 		wxTreeItemId id = this->m_treeCtrlDir->GetSelection();
-//		wxMessageBox(this->getDirTreeItemData(id)->path);
-		::wxRemoveFile(this->getDirTreeItemData(id)->path);
+		int ind = this->getDirTreeItemData(id)->ind;
+//wxMessageBox(this->getDirTreeItemData(id)->path);
+		if(ind == FILE)
+		{
+//			wxMessageBox(this->getDirTreeItemData(id)->path);
+			::wxRemoveFile(this->getDirTreeItemData(id)->path);
+		}
+		else
+#ifdef __WXMSW__
+			wxExecute(_T("cmd.exe /C rmdir /S/Q ") + this->getDirTreeItemData(id)->path);
+#endif
+
 		this->m_treeCtrlDir->Delete(id);
 		this->m_treeCtrlDir->Refresh();
 	}	
@@ -578,7 +623,10 @@ void MainDialog::OnMenuSelectionAddDir( wxCommandEvent& event )
 
 void MainDialog::OnTreeEndLabelEditElements( wxTreeEvent& event )
 {
+
 	myTreeItemElements* data = this->getElementsItemData(event.GetItem());
+	if(data->name == event.GetLabel() || event.GetLabel() == wxEmptyString) return;
+
 	switch(data->head)
 	{
 	case LINKS:
@@ -599,16 +647,21 @@ void MainDialog::OnTreeEndLabelEditElements( wxTreeEvent& event )
 					if(!str.Lower().EndsWith(_T(".gpx")))
 					{
 						str += _T(".gpx");
-						this->m_treeCtrlLayerElements->SetItemText(event.GetItem(),str);					
+						event.Skip();
+						this->m_treeCtrlLayerElements->SetItemText(event.GetItem(),str);
 					}
+					wxString oldFile = data->file;
 					wxFileName fn(data->file);
-					data->file = fn.GetPath()+wxFileName::GetPathSeparator()+str;
-					if(wxFile::Exists(data->file))
+
+					if(wxFile::Exists(fn.GetPath()+wxFileName::GetPathSeparator()+str))
 					{
-						if(wxMessageBox(_("File exsits !\n Go on ?"),_("Information"),wxYES_NO) == wxNO)
+						if(wxMessageBox(_("File exsits !\n Override it ?"),_("Information"),wxYES_NO) == wxNO)
 							return;
 					}
-					OnButtonClickSaveLayerElements( event );				
+					else
+						data->file = fn.GetPath()+wxFileName::GetPathSeparator()+str;
+
+					::wxRenameFile(	oldFile, data->file);			
 					fillDirTree(this->m_treeCtrlDir,m_textCtrlLabelDir->GetValue(),false);
 	break;
 	}
@@ -666,6 +719,10 @@ void MainDialog::OnTreeBeginDragExplorer( wxTreeEvent& event )
 
 void MainDialog::OnTreeSelectionChangedLayerTree( wxTreeEvent& event )
 {
+	if(this->showIconsList) this->showHideIconsList();
+
+	if(event.GetItem() == this->m_treeCtrlDir->GetRootItem()) return;
+
 	this->selectionDirTree = event.GetItem();
 	myTreeItemData* d = getDirTreeItemData(event.GetItem());
 
@@ -919,7 +976,6 @@ void MainDialog::OnButtonClickSaveLayerElements( wxCommandEvent& event )
 void MainDialog::writeXml()
 {
 	TiXmlDocument doc;  
-//	TiXmlElement* msg;
 	
  	TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "UTF-8", "" );  
 	doc.LinkEndChild( decl ); 
@@ -1090,6 +1146,18 @@ void MainDialog::checkLinks(TiXmlElement* telem,wxTreeItemId item)
 void MainDialog::OnTreeSelectionChangedElementsTree( wxTreeEvent& event )
 {
 	this->m_splitter1->SetSashPosition(sashPosition);
+	if(this->showIconsList) this->showHideIconsList();
+
+	int i = 0;
+	for(unsigned int n = 0; n < this->imageName->GetCount(); n++)
+	{
+	//	wxMessageBox( this->imageName->Item(n)+this->getElementsItemData(event.GetItem())->sym);
+		if( this->imageName->Item(n) == this->getElementsItemData(event.GetItem())->sym)
+			i = n;
+	}
+
+	this->m_bitmap1->SetBitmap(this->imageList->GetBitmap(i));
+	this->m_staticText13->SetLabel(this->imageDescription->Item(i));
 
 	if(textPath != wxEmptyString)
 	{
@@ -1167,13 +1235,23 @@ void MainDialog::OnTreeItemActivatedLayerElements( wxTreeEvent& event )
 	if(it)
 	{
 		wxString str = ((myTreeItemElements*)it)->file;
-		wxFileName fn(str);
-		str.Replace(_T("file:///"),_T(""));
-		wxFileType* open = wxTheMimeTypesManager->GetFileTypeFromExtension(fn.GetExt());
-		wxString cmd = open->GetOpenCommand(str);
-		cmd.Replace(_("/"),wxString(wxFileName::GetPathSeparator()));
-		wxExecute(cmd);
+		::wxLaunchDefaultBrowser(str);
 	}
+}
+
+void MainDialog:: OnListColClickSettings( wxListEvent& event )
+{
+	showHideIconsList();
+}
+
+void MainDialog::showHideIconsList()
+{
+	showIconsList = !showIconsList;
+
+	if(showIconsList)
+		this->m_splitter31->SetSashPosition(30);
+	else
+		this->m_splitter31->SetSashPosition(this->m_notebook2->GetClientRect().y-30);
 }
 
 void MainDialog::fillDirTree(wxTreeCtrl * tree, wxString str, bool tilde)
@@ -1222,7 +1300,7 @@ void MainDialog::fillDirRecursive(wxTreeCtrl * tree, wxTreeItemId root, wxString
 			wxString p;
 			bool t = dir.GetFirst(&p, wxEmptyString, wxDIR_DIRS);				
 			while(t)
-			{		
+			{	
 				wxTreeItemId id = tree->AppendItem(root,p,-1,-1,new myTreeItemData(path+wxFileName::GetPathSeparator()+p,DIR));
 				fillDirRecursive(tree, id,path+wxFileName::GetPathSeparator()+p, tilde);
 				t = dir.GetNext(&p);

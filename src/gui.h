@@ -28,6 +28,7 @@
 #include <wx/panel.h>
 #include <wx/notebook.h>
 #include <wx/stattext.h>
+#include <wx/statbmp.h>
 #include <wx/statline.h>
 #include <wx/checkbox.h>
 #include <wx/listctrl.h>
@@ -104,6 +105,7 @@ class MainDialogBase : public wxDialog
 		virtual void OnTreeSelectionChangedElementsTree( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnMenuSeletionAddText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnMenuSelectionElementsDelete( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnListColClickSettings( wxListEvent& event ) { event.Skip(); }
 		virtual void OnItemActivatedIconsList( wxListEvent& event ) { event.Skip(); }
 		virtual void OnCancelClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOKClick( wxCommandEvent& event ) { event.Skip(); }
@@ -119,6 +121,8 @@ class MainDialogBase : public wxDialog
 		wxMenuItem* m_menuItemAddText;
 		wxNotebook* m_notebook2;
 		wxStaticText* m_staticTextSettingsType;
+		wxStaticBitmap* m_bitmap1;
+		wxStaticText* m_staticText13;
 		wxCheckBox* m_checkBoxSettingsVisible;
 		wxCheckBox* m_checkBoxSettingsNameVisible;
 		wxTextCtrl* m_textCtrlSettingsName;
@@ -147,12 +151,6 @@ class MainDialogBase : public wxDialog
 		{
 			m_splitter3->SetSashPosition( 0 );
 			m_splitter3->Disconnect( wxEVT_IDLE, wxIdleEventHandler( MainDialogBase::m_splitter3OnIdle ), NULL, this );
-		}
-		
-		void m_splitter31OnIdle( wxIdleEvent& )
-		{
-			m_splitter31->SetSashPosition( 262 );
-			m_splitter31->Disconnect( wxEVT_IDLE, wxIdleEventHandler( MainDialogBase::m_splitter31OnIdle ), NULL, this );
 		}
 	
 };

@@ -7,6 +7,7 @@
 
 #include "gui.h"
 
+#include "bitmaps/empty.xpm"
 #include "folder.xpm"
 
 ///////////////////////////////////////////////////////////////////////////
@@ -148,8 +149,6 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	bSizer132 = new wxBoxSizer( wxVERTICAL );
 	
 	m_splitter31 = new wxSplitterWindow( m_panel5, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D );
-	m_splitter31->Connect( wxEVT_IDLE, wxIdleEventHandler( MainDialogBase::m_splitter31OnIdle ), NULL, this );
-	
 	m_panel101 = new wxPanel( m_splitter31, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	m_panel101->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_3DLIGHT ) );
 	
@@ -161,15 +160,27 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	
 	m_staticText51 = new wxStaticText( m_panel101, wxID_ANY, _("Type "), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText51->Wrap( -1 );
-	bSizer18->Add( m_staticText51, 0, wxALL, 5 );
+	bSizer18->Add( m_staticText51, 0, wxALL, 0 );
 	
 	m_staticTextSettingsType = new wxStaticText( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextSettingsType->Wrap( -1 );
 	m_staticTextSettingsType->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 	
-	bSizer18->Add( m_staticTextSettingsType, 0, wxALL, 5 );
+	bSizer18->Add( m_staticTextSettingsType, 0, wxALL, 0 );
 	
-	bSizer16->Add( bSizer18, 0, wxEXPAND, 5 );
+	bSizer16->Add( bSizer18, 0, wxEXPAND, 0 );
+	
+	wxBoxSizer* bSizer191;
+	bSizer191 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_bitmap1 = new wxStaticBitmap( m_panel101, wxID_ANY, wxBitmap( empty ), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer191->Add( m_bitmap1, 0, wxALL, 5 );
+	
+	m_staticText13 = new wxStaticText( m_panel101, wxID_ANY, _("MyLabel"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText13->Wrap( -1 );
+	bSizer191->Add( m_staticText13, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
+	
+	bSizer16->Add( bSizer191, 0, wxEXPAND, 0 );
 	
 	m_staticline2 = new wxStaticLine( m_panel101, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
 	bSizer16->Add( m_staticline2, 0, wxEXPAND | wxALL, 0 );
@@ -249,12 +260,12 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_textCtrlSettingsLinkName = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( m_textCtrlSettingsLinkName, 1, wxALL|wxEXPAND, 0 );
 	
-	m_staticText12 = new wxStaticText( m_panel101, wxID_ANY, _("Link-File"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText12 = new wxStaticText( m_panel101, wxID_ANY, _("File"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText12->Wrap( -1 );
 	fgSizer1->Add( m_staticText12, 0, wxALL, 0 );
 	
 	m_staticTextSettingsLinksFile = new wxStaticText( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextSettingsLinksFile->Wrap( -1 );
+	m_staticTextSettingsLinksFile->Wrap( 30 );
 	fgSizer1->Add( m_staticTextSettingsLinksFile, 0, wxALL, 0 );
 	
 	bSizer20->Add( fgSizer1, 1, wxEXPAND, 5 );
@@ -274,7 +285,7 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel111->SetSizer( bSizer171 );
 	m_panel111->Layout();
 	bSizer171->Fit( m_panel111 );
-	m_splitter31->SplitHorizontally( m_panel101, m_panel111, 262 );
+	m_splitter31->SplitHorizontally( m_panel101, m_panel111, -1 );
 	bSizer132->Add( m_splitter31, 1, wxEXPAND, 5 );
 	
 	m_panel5->SetSizer( bSizer132 );
@@ -349,6 +360,7 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_treeCtrlLayerElements->Connect( wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler( MainDialogBase::OnTreeSelectionChangedElementsTree ), NULL, this );
 	this->Connect( m_menuItemAddText->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogBase::OnMenuSeletionAddText ) );
 	this->Connect( m_menuItemElementsDelete->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogBase::OnMenuSelectionElementsDelete ) );
+	m_listCtrlSettingsIcons->Connect( wxEVT_COMMAND_LIST_COL_CLICK, wxListEventHandler( MainDialogBase::OnListColClickSettings ), NULL, this );
 	m_listCtrlSettingsIcons->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( MainDialogBase::OnItemActivatedIconsList ), NULL, this );
 	m_sdbSizerCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogBase::OnCancelClick ), NULL, this );
 	m_sdbSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogBase::OnOKClick ), NULL, this );
@@ -380,6 +392,7 @@ MainDialogBase::~MainDialogBase()
 	m_treeCtrlLayerElements->Disconnect( wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler( MainDialogBase::OnTreeSelectionChangedElementsTree ), NULL, this );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogBase::OnMenuSeletionAddText ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogBase::OnMenuSelectionElementsDelete ) );
+	m_listCtrlSettingsIcons->Disconnect( wxEVT_COMMAND_LIST_COL_CLICK, wxListEventHandler( MainDialogBase::OnListColClickSettings ), NULL, this );
 	m_listCtrlSettingsIcons->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( MainDialogBase::OnItemActivatedIconsList ), NULL, this );
 	m_sdbSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogBase::OnCancelClick ), NULL, this );
 	m_sdbSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogBase::OnOKClick ), NULL, this );
