@@ -131,7 +131,7 @@ bool DnDFile::sortInTree(wxTreeCtrl* tree, wxCoord x, wxCoord y, const wxArraySt
 	}
 
 //	wxMessageBox(dialog->getDirTreeItemData(prev)->path+_T("\n")+dialog->getDirTreeItemData(iditem)->path);
-	bool t = ::wxRenameFile(dialog->getDirTreeItemData(prev)->path,dialog->getDirTreeItemData(iditem)->path);
+	::wxRenameFile(dialog->getDirTreeItemData(prev)->path,dialog->getDirTreeItemData(iditem)->path);
 	tree->Delete(prev);
 	return true;
 }
@@ -139,6 +139,8 @@ bool DnDFile::sortInTree(wxTreeCtrl* tree, wxCoord x, wxCoord y, const wxArraySt
 bool DnDFile::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 {
 	wxTreeItemId id	;
+	
+	//dialog->m_treeCtrlDir->SelectItem(dialog->oldDirTreeItem);
     size_t nFiles = filenames.GetCount();
 	if( m_pSender == m_pOwner) return sortInTree(m_pOwner,x,y,filenames);
 
@@ -181,7 +183,13 @@ bool DnDFile::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 			m_pOwner->AppendItem(id,fn.GetName(),40,-1,links);
 			links->head = MainDialog::LINKS;
 			wxURI uri(_T("file://")+filenames[n]);
+#ifdef __WXMSW__			
 			links->file = _T("file:///")+uri.GetPath();
+#endif
+#ifdef __WXGTK__
+			links->file = _T("file://")+uri.GetPath();			
+#endif
+			
 			links->text = fn.GetName();	
 			dialog->modified = true;
 			
@@ -191,7 +199,7 @@ bool DnDFile::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 			wxString zz = fn.GetPath() + wxFileName::GetPathSeparator() + fnfrom.GetFullName();
 			if(!wxFile::Exists(zz))
 			{
-				bool t = ::wxCopyFile(filenames[n],zz);
+				::wxCopyFile(filenames[n],zz);
 				dialog->fillDirTree(dialog->m_treeCtrlDir,dialog->pHome_Locn,false);
 			}
 		}
@@ -356,9 +364,14 @@ void MainDialog::OnInit(wxInitDialogEvent& init)
 	pHome_Locn = stdPath;
 	pHome_Locn += wxString(wxFileName::GetPathSeparator()) + _T("layers");
 
+#ifdef __WXGTK__
+	if(!wxDir::Exists(pHome_Locn))
+		::wxMkDir(pHome_Locn.mb_str(),0777);
+#endif
+#ifdef __WXMSW__
 	if(!wxDir::Exists(pHome_Locn))
 		::wxMkDir(pHome_Locn);
-
+#endif
 	pExplorer_Locn  = _T("");
 
 	this->m_treeCtrlLayerElements->SetDropTarget(new DnDFile(this,m_treeCtrlLayerElements, this->m_treeCtrlDir));
@@ -366,7 +379,9 @@ void MainDialog::OnInit(wxInitDialogEvent& init)
 	this->m_textCtrlLabelDir->SetValue(pHome_Locn);
 	fillDirTree(this->m_treeCtrlDir,this->m_textCtrlLabelDir->GetValue(),false);	
 
-	this->sashPosition = 220;
+	this->sashPosition = 240;
+	this->m_splitter1->SetSashPosition(this->sashPosition, true);
+
 	this->m_splitter31->SetSashPosition(this->m_notebook2->GetClientRect().y-30);
 }
 
@@ -381,7 +396,7 @@ void MainDialog::OnMenuItemSelectionPaperbagRecover( wxCommandEvent& event )
 	wxString str = ((myTreeItemData*)this->m_treeCtrlTrash->GetItemData(this->m_treeCtrlTrash->GetSelection()))->path;
 	wxString s = str;
 	s.RemoveLast();
-	int i = ::wxRename(str,s);
+	::wxRename(str,s);
 	fillDirTree(this->m_treeCtrlTrash,pHome_Locn,true);
 	fillDirTree(this->m_treeCtrlDir,pHome_Locn,true);
 }
@@ -389,7 +404,7 @@ void MainDialog::OnMenuItemSelectionPaperbagRecover( wxCommandEvent& event )
 void MainDialog::OnMenuItemPaperbagEmpty( wxCommandEvent& event )
 {
 	wxString str = this->getDirTreeItemData(this->m_treeCtrlTrash->GetSelection())->path;
-	bool i = ::wxRemoveFile(str);
+	::wxRemoveFile(str);
 	this->m_treeCtrlTrash->Delete(this->m_treeCtrlTrash->GetSelection());
 }
 
@@ -444,11 +459,12 @@ void MainDialog::OnMenuSeletionAddText( wxCommandEvent& event )
 	this->m_textCtrlEditText->Clear();
 	sashPosition = this->m_splitter1->GetSashPosition(); 
 	this->m_splitter1->SetSashPosition(100);
+	this->m_notebook2->SetSelection(1);
 
 	wxFileName fn = getElementsItemData(m_treeCtrlLayerElements->GetRootItem())->file;
 	wxArrayString files;
 	int i = wxDir::GetAllFiles(fn.GetPath(),&files,_T("Unnamed*.*"));
-	wxString path = wxString::Format(_T("%s%cUnnamed(%i).txt"),fn.GetPath(),wxFileName::GetPathSeparator(),i);
+	wxString path = wxString::Format(_T("%s%cUnnamed(%i).txt"),fn.GetPath().c_str(),wxFileName::GetPathSeparator(),i);
 	textPath = path;
 	wxFile f;
 	if(!f.Exists(path))
@@ -459,7 +475,7 @@ void MainDialog::OnMenuSeletionAddText( wxCommandEvent& event )
 	elem->head = LINKS;
 	elem->text = n.GetFullName();
 	elem->file = path;
-	m_treeCtrlLayerElements->AppendItem(m_treeCtrlLayerElements->GetSelection(),n.GetFullName(),-1,-1,elem);
+	m_treeCtrlLayerElements->AppendItem(m_treeCtrlLayerElements->GetSelection(),n.GetFullName(),40,-1,elem);
 	
 	this->m_treeCtrlLayerElements->ExpandAll();
 	this->m_textCtrlEditText->SetFocus();
@@ -512,7 +528,7 @@ void MainDialog::OnButtonClickNewLayer( wxCommandEvent& event )
 	{
 		wxArrayString dummy;
 		int i = wxDir::GetAllFiles(path,&dummy);
-		if(i > 0) str = wxString::Format(_T("%s(%i).gpx"),str,i);
+		if(i > 0) str = wxString::Format(_T("%s(%i).gpx"),str.c_str(),i);
 	}
 	else
 		str += _T(".gpx");
@@ -594,12 +610,13 @@ void MainDialog::OnTreeItemActivatedDirTree( wxTreeEvent& event )
 	if(it)
 	{
 		wxString str = ((myTreeItemData*)it)->path;
-		wxFileName fn(str);
-		str.Replace(_T("file:///"),_T(""));
-		wxFileType* open = wxTheMimeTypesManager->GetFileTypeFromExtension(fn.GetExt());
-		wxString cmd = open->GetOpenCommand(str);
-		cmd.Replace(_("/"),wxString(wxFileName::GetPathSeparator()));
-		wxExecute(cmd);
+		//wxFileName fn(str);
+		//str.Replace(_T("file:///"),_T(""));
+		//wxFileType* open = wxTheMimeTypesManager->GetFileTypeFromExtension(fn.GetExt());
+		//wxString cmd = open->GetOpenCommand(str);
+		//cmd.Replace(_("/"),wxString(wxFileName::GetPathSeparator()));
+		//wxExecute(cmd);
+		::wxLaunchDefaultBrowser(str);
 	}	
 }
 
@@ -617,7 +634,12 @@ void MainDialog::OnMenuSelectionAddDir( wxCommandEvent& event )
 		dir = data->path;
 
 	dir += wxString(wxFileName::GetPathSeparator()) + _("Unnamed");
-	bool t = ::wxMkdir(dir);
+#ifdef __WXGTK__
+	::wxMkDir(dir.mb_str(),0777);
+#endif
+#ifdef __WXMSW__
+	::wxMkDir(dir);
+#endif
 	this->fillDirTree(this->m_treeCtrlDir,this->m_textCtrlLabelDir->GetValue(),false);
 }
 
@@ -670,6 +692,9 @@ void MainDialog::OnTreeEndLabelEditElements( wxTreeEvent& event )
 		
 void MainDialog::OnTreeBeginnDragFile( wxTreeEvent& event )
 {
+        this->m_treeCtrlDir->SelectItem(this->oldDirTreeItem);
+	//this->oldDirTreeItem = this->m_treeCtrlDir->GetNextVisible(this->oldDirTreeItem);
+//wxMessageBox(this->m_treeCtrlDir->GetItemText(this->oldDirTreeItem));
 	this->selectionDirTree = event.GetItem();
 	myTreeItemData* dat = getDirTreeItemData(event.GetItem());
 	if(dat->ind == DIR) return;
@@ -695,6 +720,9 @@ void MainDialog::OnTreeBeginnDragFile( wxTreeEvent& event )
 			break;
 	    default:         /* do nothing */ break;
 	}
+	wxTreeItemId id = this->findTreeItem(this->m_treeCtrlDir, this->m_treeCtrlDir->GetRootItem(), 
+					     this->m_treeCtrlLayerElements->GetItemText(this->m_treeCtrlLayerElements->GetRootItem()),false, true);
+	this->m_treeCtrlDir->SelectItem(id);
 }
 
 void MainDialog::OnTreeBeginDragExplorer( wxTreeEvent& event )
@@ -719,6 +747,7 @@ void MainDialog::OnTreeBeginDragExplorer( wxTreeEvent& event )
 
 void MainDialog::OnTreeSelectionChangedLayerTree( wxTreeEvent& event )
 {
+	oldDirTreeItem = event.GetOldItem();
 	if(this->showIconsList) this->showHideIconsList();
 
 	if(event.GetItem() == this->m_treeCtrlDir->GetRootItem()) return;
@@ -728,17 +757,18 @@ void MainDialog::OnTreeSelectionChangedLayerTree( wxTreeEvent& event )
 
 	if(d != NULL)
 	{
-		if((!m_treeCtrlLayerElements->IsEmpty() && modified))
+	/*	if((!m_treeCtrlLayerElements->IsEmpty() && modified))
 		{
 			wxString fileElements = getElementsItemData(this->m_treeCtrlLayerElements->GetRootItem())->file;
 			if(wxFile::Exists(fileElements))
 				{
-					if(wxMessageBox(wxString::Format(_("File %s exists !\n Override it ?"), fileElements),_("Information"),wxYES_NO) == wxYES)
+					if(wxMessageBox(wxString::Format(_("File %s exists !\n Override it ?"), fileElements.c_str()),_("Information"),wxYES_NO) == wxYES)
 						OnButtonClickSaveLayerElements( event );
 				}			
 
 		}
-
+*/
+		OnButtonClickSaveLayerElements( event );
 		this->m_treeCtrlLayerElements->DeleteAllItems();
 		wxFileName fn(d->path);
 		if(!(fn.GetExt() == _T("gpx"))) return;
