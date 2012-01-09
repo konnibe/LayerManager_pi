@@ -72,7 +72,7 @@ class MainDialog : public MainDialogBase
 		wxArrayString* imageDescription;
 		wxArrayString* imageName;
 
-		wxTreeItemId selectionDirTree, selElementsTree;
+		wxTreeItemId 		selectionDirTree, selElementsTree;
 		
 private:	
 		void createImageList();
@@ -87,9 +87,10 @@ private:
 		int getImageName(wxString str);
 		void showHideIconsList();
 
-		LayerManager_pi* parent;
-		int sashPosition;
-	    bool showIconsList;
+		LayerManager_pi* 	parent;
+		int 			sashPosition;
+		bool 			showIconsList;
+		wxTreeItemId		oldDirTreeItem;
 };
 
 class myTreeItemData : public wxTreeItemData

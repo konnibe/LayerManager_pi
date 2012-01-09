@@ -42,7 +42,7 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	wxBoxSizer* bSizer8;
 	bSizer8 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_notebook1 = new wxNotebook( m_panel61, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_notebook1 = new wxNotebook( m_panel61, wxID_ANY, wxDefaultPosition, wxSize( 240,-1 ), 0 );
 	m_panel2 = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer3;
 	bSizer3 = new wxBoxSizer( wxVERTICAL );
@@ -315,7 +315,7 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel91->SetSizer( bSizer121 );
 	m_panel91->Layout();
 	bSizer121->Fit( m_panel91 );
-	m_splitter1->SplitVertically( m_panel61, m_panel91, 200 );
+	m_splitter1->SplitVertically( m_panel61, m_panel91, 240 );
 	bSizer2->Add( m_splitter1, 1, wxEXPAND, 5 );
 	
 	mainSizer->Add( bSizer2, 1, wxEXPAND, 5 );
