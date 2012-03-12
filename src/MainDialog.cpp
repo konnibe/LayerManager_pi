@@ -204,7 +204,9 @@ bool DnDFile::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
 			}
 		}
     }
-	m_pOwner->ExpandAll();
+	m_pOwner->Expand(id);
+	//m_pOwner->ExpandAll();
+//	m_pOwner->Refresh();
     return true;
 }
 
@@ -227,6 +229,12 @@ void MainDialog::OnCloseDialog(wxCloseEvent& event)
 
 void MainDialog::OnOKClick(wxCommandEvent& event)
 {
+	if(modified)
+	{
+		int ret = wxMessageBox(_T("Layer has been modified\nSave the layer ?"),_T(""),wxOK|wxCANCEL);
+		if(ret == wxOK)
+			OnButtonClickSaveLayerElements( event );
+	}
 	parent->DeInit();
 }
 
@@ -292,6 +300,23 @@ void MainDialog::createImageList()
 	imageList->Add(makeImage(diamond));		imageName->Add(_T("diamond"));		imageDescription->Add(_T("Diamond"));
 	imageList->Add(makeImage(activepoint));	imageName->Add(_T("activepoint"));	imageDescription->Add(_T("Active WP"));
 
+	wxString iconPath = stdPath + _T("UserIcons") ;
+	wxArrayString files;
+	wxDir::GetAllFiles(iconPath,&files,wxEmptyString, wxDIR_FILES);
+
+	for(unsigned int i = 0; i < files.GetCount(); i++)
+	{
+		wxFileName fn(files[i]);
+		wxString name = fn.GetName();
+		wxImage img(files[i],wxBITMAP_TYPE_ANY);
+		img.Rescale(16,16);
+
+		imageList->Add(img);
+		imageName->Add(name);	
+		imageDescription->Add(name);
+
+	}
+
 	this->m_treeCtrlLayerElements->SetImageList(imageList);
 	this->m_listCtrlSettingsIcons->SetImageList(imageList,wxIMAGE_LIST_SMALL);
 
@@ -303,11 +328,16 @@ void MainDialog::createImageList()
 
 	wxListItem col1;
 	col1.SetColumn(1);
+#ifdef __WXMSW__
+	col1.SetWidth(130);
+#endif
+#ifdef __WXGTK__
 	col1.SetWidth(150);
+#endif
 	col1.SetText(_("Description"));
 	this->m_listCtrlSettingsIcons->InsertColumn(1,col1);
 
-	for(long i = 0; i < imageList->GetImageCount(); i++)
+	for(long i = 1; i < imageList->GetImageCount(); i++)
 	{
 		long ind = this->m_listCtrlSettingsIcons->InsertItem(i,_T(""),0);
 		this->m_listCtrlSettingsIcons->SetItem(ind, 1, (*imageDescription)[i]);
@@ -323,12 +353,12 @@ void MainDialog::OnItemActivatedIconsList( wxListEvent& event )
 
 	modified = true;
 
-	this->m_treeCtrlLayerElements->SetItemImage(this->m_treeCtrlLayerElements->GetSelection(),
-		event.GetIndex());
+	this->m_treeCtrlLayerElements->SetItemImage(m_treeCtrlLayerElements->GetSelection(),
+		event.GetIndex()+1);
 	this->getElementsItemData(this->m_treeCtrlLayerElements->GetSelection())->sym = 
-		imageName->Item(event.GetIndex());
-	this->m_bitmap1->SetBitmap(this->imageList->GetBitmap(event.GetIndex()));
-	this->m_staticText13->SetLabel(this->imageDescription->Item(event.GetIndex()));
+		imageName->Item(event.GetIndex()+1);
+	this->m_bitmap1->SetBitmap(this->imageList->GetBitmap(event.GetIndex()+1));
+	this->m_staticText13->SetLabel(this->imageDescription->Item(event.GetIndex()+1));
 }
 
 wxImage MainDialog::makeImage(const char *icon[])
@@ -348,20 +378,19 @@ void MainDialog::OnInit(wxInitDialogEvent& init)
 
 	this->m_treeCtrlDir->SelectItem(this->m_treeCtrlDir->GetRootItem());
 
-	createImageList();
-
 	wxStandardPathsBase& std_path = wxStandardPathsBase::Get();
 #ifdef __WXMSW__
-	wxString stdPath  = std_path.GetConfigDir();
+	stdPath  = std_path.GetConfigDir();
 #endif
 #ifdef __WXGTK__
-	wxString stdPath  = std_path.GetUserDataDir();
+	stdPath  = std_path.GetUserDataDir();
 #endif
 #ifdef __WXOSX__
-	wxString stdPath  = std_path.GetUserConfigDir();   // should be ~/Library/Preferences	
+	stdPath  = std_path.GetUserConfigDir();   // should be ~/Library/Preferences	
 #endif
 
 	pHome_Locn = stdPath;
+	stdPath += wxString(wxFileName::GetPathSeparator());
 	pHome_Locn += wxString(wxFileName::GetPathSeparator()) + _T("layers");
 
 #ifdef __WXGTK__
@@ -374,6 +403,8 @@ void MainDialog::OnInit(wxInitDialogEvent& init)
 #endif
 	pExplorer_Locn  = _T("");
 
+	createImageList();
+
 	this->m_treeCtrlLayerElements->SetDropTarget(new DnDFile(this,m_treeCtrlLayerElements, this->m_treeCtrlDir));
 	this->m_treeCtrlDir->SetDropTarget(new DnDFile(this,this->m_treeCtrlDir, this->m_treeCtrlDir));
 	this->m_textCtrlLabelDir->SetValue(pHome_Locn);
@@ -383,6 +414,8 @@ void MainDialog::OnInit(wxInitDialogEvent& init)
 	this->m_splitter1->SetSashPosition(this->sashPosition, true);
 
 	this->m_splitter31->SetSashPosition(this->m_notebook2->GetClientRect().y-30);
+	this->m_treeCtrlDir->SetFocus();
+	this->m_treeCtrlDir->SelectItem(this->m_treeCtrlDir->GetRootItem());
 }
 
 void MainDialog::OnItemRightClickPaperbag( wxTreeEvent& event )
@@ -477,7 +510,7 @@ void MainDialog::OnMenuSeletionAddText( wxCommandEvent& event )
 	elem->file = path;
 	m_treeCtrlLayerElements->AppendItem(m_treeCtrlLayerElements->GetSelection(),n.GetFullName(),40,-1,elem);
 	
-	this->m_treeCtrlLayerElements->ExpandAll();
+	//this->m_treeCtrlLayerElements->ExpandAll();
 	this->m_textCtrlEditText->SetFocus();
 	modified = true;
 }
@@ -610,6 +643,7 @@ void MainDialog::OnTreeItemActivatedDirTree( wxTreeEvent& event )
 	if(it)
 	{
 		wxString str = ((myTreeItemData*)it)->path;
+		if(!str.Lower().EndsWith(_T("gpx")))
 		//wxFileName fn(str);
 		//str.Replace(_T("file:///"),_T(""));
 		//wxFileType* open = wxTheMimeTypesManager->GetFileTypeFromExtension(fn.GetExt());
@@ -653,17 +687,20 @@ void MainDialog::OnTreeEndLabelEditElements( wxTreeEvent& event )
 	{
 	case LINKS:
 				{	data->text = event.GetLabel();
-					wxString temp = data->file;
+					this->m_textCtrlSettingsLinkName->SetValue(data->text);
+					/*wxString temp = data->file;
 					wxFileName fn(data->file);
 					data->file = fn.GetPath() + wxFileName::GetPathSeparator() + data->text + _T(".") + fn.GetExt();
 					::wxRenameFile(temp,data->file);
 					fillDirTree(this->m_treeCtrlDir,m_textCtrlLabelDir->GetValue(),false);
+					*/
 				}
 		break;
 	case ROUTE:
 	case ROUTEPOINT:
 	case WAYPOINT:
 					data->name = event.GetLabel();
+					this->m_textCtrlSettingsName->SetValue(data->name);
 		break;
 	case ROOT:      wxString str = event.GetLabel();
 					if(!str.Lower().EndsWith(_T(".gpx")))
@@ -692,7 +729,7 @@ void MainDialog::OnTreeEndLabelEditElements( wxTreeEvent& event )
 		
 void MainDialog::OnTreeBeginnDragFile( wxTreeEvent& event )
 {
-        this->m_treeCtrlDir->SelectItem(this->oldDirTreeItem);
+    //    this->m_treeCtrlDir->SelectItem(this->oldDirTreeItem);
 	//this->oldDirTreeItem = this->m_treeCtrlDir->GetNextVisible(this->oldDirTreeItem);
 //wxMessageBox(this->m_treeCtrlDir->GetItemText(this->oldDirTreeItem));
 	this->selectionDirTree = event.GetItem();
@@ -722,7 +759,7 @@ void MainDialog::OnTreeBeginnDragFile( wxTreeEvent& event )
 	}
 	wxTreeItemId id = this->findTreeItem(this->m_treeCtrlDir, this->m_treeCtrlDir->GetRootItem(), 
 					     this->m_treeCtrlLayerElements->GetItemText(this->m_treeCtrlLayerElements->GetRootItem()),false, true);
-	this->m_treeCtrlDir->SelectItem(id);
+	//this->m_treeCtrlDir->SelectItem(id);
 }
 
 void MainDialog::OnTreeBeginDragExplorer( wxTreeEvent& event )
@@ -769,23 +806,25 @@ void MainDialog::OnTreeSelectionChangedLayerTree( wxTreeEvent& event )
 		}
 */
 		OnButtonClickSaveLayerElements( event );
-		this->m_treeCtrlLayerElements->DeleteAllItems();
 		wxFileName fn(d->path);
 		if(!(fn.GetExt() == _T("gpx"))) return;
 
+		this->m_treeCtrlLayerElements->DeleteAllItems();
 		myTreeItemElements* elem = new myTreeItemElements();
 		elem->file = getDirTreeItemData(m_treeCtrlDir->GetSelection())->path;
+		elem->sym = _T("folder");
 		elem->head = ROOT;
 		this->m_treeCtrlLayerElements->AddRoot(m_treeCtrlDir->GetItemText(m_treeCtrlDir->GetSelection()),0,-1,elem);		
 
 		TiXmlDocument doc( getDirTreeItemData(event.GetItem())->path.mb_str() );
-		doc.LoadFile();
+		doc.LoadFile(TIXML_ENCODING_UTF8);
 		
 		wxTreeItemId root = m_treeCtrlLayerElements->GetRootItem();
 		appendXMLElement(&doc,m_treeCtrlLayerElements,root);
-		m_treeCtrlLayerElements->SelectItem(root);
-		m_treeCtrlLayerElements->Refresh();			
-		m_treeCtrlLayerElements->ExpandAll();
+		m_treeCtrlLayerElements->SelectItem(root);	
+		m_treeCtrlLayerElements->Expand(m_treeCtrlLayerElements->GetRootItem());
+		m_treeCtrlLayerElements->EnsureVisible(m_treeCtrlLayerElements->GetRootItem());
+	    m_treeCtrlLayerElements->SetFocus();
 		modified = false;
 	}
 }
@@ -880,6 +919,7 @@ void MainDialog::appendXMLElement(TiXmlNode* node, wxTreeCtrl* tree,  wxTreeItem
 		
 		if(wxString(node->Value(),wxConvUTF8) == _T("name"))
 		{
+			const char* tt = node->ToElement()->GetText();
 			elem->name = wxString(node->ToElement()->GetText(),wxConvUTF8);
 			switch(elem->head)
 			{
@@ -905,20 +945,24 @@ void MainDialog::appendXMLElement(TiXmlNode* node, wxTreeCtrl* tree,  wxTreeItem
 		if(wxString(node->Value(),wxConvUTF8) == _T("sym"))
 		{
 			elem->sym = wxString(node->ToElement()->GetText(),wxConvUTF8);
-			
+			int icon = this->getImageName(elem->sym);
+
+			if(icon == -1)
+				icon =  this->getImageName(_T("circle"));
+
 			switch(elem->head)
 			{
 			case WAYPOINT:
-				tree->SetItemImage(treeItemId,this->getImageName(elem->sym));
+				tree->SetItemImage(treeItemId,icon);
 				break;
 			case ROUTE:	
-				tree->SetItemImage(treeItemIdRoute,this->getImageName(elem->sym));
+				tree->SetItemImage(treeItemIdRoute,icon);
 				break;
 			case ROUTEPOINT:
-				tree->SetItemImage(treeItemId,this->getImageName(elem->sym));
+				tree->SetItemImage(treeItemId,icon);
 				break;
 			case TRACKPOINT:
-				tree->SetItemImage(treeItemId,this->getImageName(elem->sym));
+				tree->SetItemImage(treeItemId,icon);
 				break;
 			}
 
@@ -1021,7 +1065,7 @@ void MainDialog::writeXml()
 	doc.LinkEndChild( root ); 	
 	
 	recursiveWrite(m_treeCtrlLayerElements->GetRootItem(), root, root);
-	doc.SaveFile(getElementsItemData(this->m_treeCtrlLayerElements->GetRootItem())->file.mb_str()); 	
+	doc.SaveFile(getElementsItemData(this->m_treeCtrlLayerElements->GetRootItem())->file.mb_str(wxConvUTF8)); 	
 }
 
 wxTreeItemId MainDialog::recursiveWrite(wxTreeItemId id, TiXmlElement *elem, TiXmlElement *root)
@@ -1047,15 +1091,15 @@ wxTreeItemId MainDialog::recursiveWrite(wxTreeItemId id, TiXmlElement *elem, TiX
 								route = new TiXmlElement("rte");					
 								elem->LinkEndChild(route);
 								
-								addElement(route,"name",data->name.mb_str());
+								addElement(route,"name",data->name.mb_str(wxConvUTF8));
 						
 								TiXmlElement* ext = new TiXmlElement("extensions");
 								route->LinkEndChild(ext);	
 
-								addElement(ext,"opencpn:start",data->start.mb_str());
-								addElement(ext,"opencpn:end",data->end.mb_str());
-								addElement(ext,"opencpn:viz",data->viz.mb_str());
-								addElement(ext,"opencpn:guid",data->guid.mb_str());	
+								addElement(ext,"opencpn:start",data->start.mb_str(wxConvUTF8));
+								addElement(ext,"opencpn:end",data->end.mb_str(wxConvUTF8));
+								addElement(ext,"opencpn:viz",data->viz.mb_str(wxConvUTF8));
+								addElement(ext,"opencpn:guid",data->guid.mb_str(wxConvUTF8));	
 								elem = route;
 						}			
 			break;
@@ -1065,16 +1109,16 @@ wxTreeItemId MainDialog::recursiveWrite(wxTreeItemId id, TiXmlElement *elem, TiX
 								elem->LinkEndChild(track);
 								elem = track;
 								
-								addElement(track,"name",data->name.mb_str());
+								addElement(track,"name",data->name.mb_str(wxConvUTF8));
 						
 								TiXmlElement* ext = new TiXmlElement("extensions");
 								track->LinkEndChild(ext);	
 
-								addElement(ext,"opencpn:start",data->start.mb_str());
-								addElement(ext,"opencpn:end",data->end.mb_str());	
-								addElement(ext,"opencpn:guid",data->guid.mb_str());
-								addElement(ext,"opencpn:viz",data->viz.mb_str());
-								addElement(ext,"opencpn:viz_name",data->vizName.mb_str());
+								addElement(ext,"opencpn:start",data->start.mb_str(wxConvUTF8));
+								addElement(ext,"opencpn:end",data->end.mb_str(wxConvUTF8));	
+								addElement(ext,"opencpn:guid",data->guid.mb_str(wxConvUTF8));
+								addElement(ext,"opencpn:viz",data->viz.mb_str(wxConvUTF8));
+								addElement(ext,"opencpn:viz_name",data->vizName.mb_str(wxConvUTF8));
 						}				
 			break;
 			case TRACKSEGMENT:
@@ -1102,27 +1146,28 @@ wxTreeItemId MainDialog::recursiveWrite(wxTreeItemId id, TiXmlElement *elem, TiX
 										break;									
 								}
 
-								telem->SetAttribute("lat",data->lat.mb_str());
-								telem->SetAttribute("lon",data->lon.mb_str());								
+								telem->SetAttribute("lat",data->lat.mb_str(wxConvUTF8));
+								telem->SetAttribute("lon",data->lon.mb_str(wxConvUTF8));								
 								elem->LinkEndChild(telem);
 								
-								addElement(telem,"time",data->dateTime.mb_str());
-								addElement(telem,"name",data->name.mb_str());
-								addElement(telem,"desc",data->desc.mb_str());
-								addElement(telem,"sym",data->sym.mb_str());	
-								addElement(telem,"type",data->type.mb_str());									
+								addElement(telem,"time",data->dateTime.mb_str(wxConvUTF8));
+								addElement(telem,"name",data->name.mb_str(wxConvUTF8));
+								if(!data->desc.IsEmpty())
+									addElement(telem,"desc",data->desc.mb_str(wxConvUTF8));
+								addElement(telem,"sym",data->sym.mb_str(wxConvUTF8));	
+								addElement(telem,"type",data->type.mb_str(wxConvUTF8));									
 								
 								checkLinks(telem,item);
 								
 								TiXmlElement* ext = new TiXmlElement("extensions");
 								telem->LinkEndChild(ext);	
 							
-								addElement(ext,"opencpn:guid",data->guid.mb_str());
-								addElement(ext,"opencpn:viz",data->viz.mb_str());
+								addElement(ext,"opencpn:guid",data->guid.mb_str(wxConvUTF8));
+								addElement(ext,"opencpn:viz",data->viz.mb_str(wxConvUTF8));
 								switch(data->head)
 								{
-								case ROUTEPOINT: addElement(ext,"opencpn:auto_name",data->auto_name.mb_str()); break;
-								case WAYPOINT:   addElement(ext,"opencpn:viz_name",data->vizName.mb_str()); break;
+								case ROUTEPOINT: addElement(ext,"opencpn:auto_name",data->auto_name.mb_str(wxConvUTF8)); break;
+								case WAYPOINT:   addElement(ext,"opencpn:viz_name",data->vizName.mb_str(wxConvUTF8)); break;
 								}
 							}
 			break;
@@ -1163,10 +1208,10 @@ void MainDialog::checkLinks(TiXmlElement* telem,wxTreeItemId item)
 			myTreeItemElements* links = getElementsItemData(it);
 							
 			TiXmlElement* ext = new TiXmlElement("link");
-			ext->SetAttribute("href",links->file.mb_str());
+			ext->SetAttribute("href",links->file.mb_str(wxConvUTF8));
 			telem->LinkEndChild(ext);	
 			TiXmlElement* celem = new TiXmlElement("text");
-			celem->LinkEndChild(new TiXmlText(links->text.mb_str()));
+			celem->LinkEndChild(new TiXmlText(links->text.mb_str(wxConvUTF8)));
 			ext->LinkEndChild(celem);
 			it = this->m_treeCtrlLayerElements->GetNextChild(item, cookie );
 		}										
@@ -1178,17 +1223,31 @@ void MainDialog::OnTreeSelectionChangedElementsTree( wxTreeEvent& event )
 	this->m_splitter1->SetSashPosition(sashPosition);
 	if(this->showIconsList) this->showHideIconsList();
 
-	int i = 0;
+	int i = -1;
 	for(unsigned int n = 0; n < this->imageName->GetCount(); n++)
 	{
-	//	wxMessageBox( this->imageName->Item(n)+this->getElementsItemData(event.GetItem())->sym);
 		if( this->imageName->Item(n) == this->getElementsItemData(event.GetItem())->sym)
 			i = n;
 	}
 
-	this->m_bitmap1->SetBitmap(this->imageList->GetBitmap(i));
-	this->m_staticText13->SetLabel(this->imageDescription->Item(i));
-
+	if(i != -1)
+	{
+		m_bitmap1->SetBitmap(this->imageList->GetBitmap(i));
+		m_staticText13->SetLabel(this->imageDescription->Item(i));
+	}
+	else
+	{
+		if( this->getElementsItemData(event.GetItem())->head != LINKS && this->getElementsItemData(event.GetItem())->type == _T("WPT") )
+		{
+			m_bitmap1->SetBitmap(this->imageList->GetBitmap(imageName->Index(_T("circle"))));
+			m_staticText13->SetLabel(_T("Icon \"") + this->getElementsItemData(event.GetItem())->sym + _T("\" not found using circle"));
+		}
+		else
+		{
+			m_bitmap1->SetBitmap(this->imageList->GetBitmap(imageName->Index(_T("empty"))));
+			m_staticText13->SetLabel(_T(""));
+		}
+	}
 	if(textPath != wxEmptyString)
 	{
 		wxFFileOutputStream output( textPath );
@@ -1248,24 +1307,141 @@ void MainDialog::setSettingsPage(myTreeItemElements* elem)
 //	this->m_staticTextSettingsType->SetLabel(elem->type);
 	this->m_checkBoxSettingsVisible->SetValue((elem->viz == _T("0"))?0:1);
 	this->m_checkBoxSettingsNameVisible->SetValue((elem->vizName == _T("0"))?0:1);
-	this->m_textCtrlSettingsName->SetValue(elem->name);
+	this->m_textCtrlSettingsName->ChangeValue(elem->name);
 	this->m_textCtrlSetingsDescription->SetValue(elem->desc);
 	this->m_textCtrlLatitude->SetValue(elem->lat);
 	this->m_textCtrlSettingsLongitude->SetValue(elem->lon);
 	this->m_textCtrlDateTime->SetValue(elem->dateTime);
 	this->m_textCtrlSettingsStart->SetValue(elem->start);
 	this->m_textCtrlSettingsEnd->SetValue(elem->end);
-	this->m_textCtrlSettingsLinkName->SetValue(elem->text);
+	this->m_textCtrlSettingsLinkName->ChangeValue(elem->text);
 	this->m_staticTextSettingsLinksFile->SetLabel(elem->file);
+
+	setSettingsReadonly(elem->head);
+	this->m_panel101->Refresh();
 }
 
+void MainDialog::setSettingsReadonly(int head)
+{
+	wxWindowList list = this->m_panel101->GetChildren();
+	wxColour color;
+
+	for(unsigned int i = 0; i < list.GetCount(); i++)
+	{
+		if(wxString (list[i]->GetClassInfo()->GetClassName(),wxConvUTF8) == _T("wxTextCtrl"))
+			((wxTextCtrl*)list[i])->Enable(false);
+		if(wxString (list[i]->GetClassInfo()->GetClassName(),wxConvUTF8) == _T("wxCheckBox"))
+			((wxCheckBox*)list[i])->Enable(false);
+	}
+	//color =	this->m_textCtrlSetingsDescription->GetBackgroundColour();
+	this->m_textCtrlSetingsDescription->SetBackgroundColour(wxColour(235,235,235));
+
+	switch(head)
+	{
+	case ROUTE: 
+		this->m_textCtrlSettingsName->Enable();
+		this->m_textCtrlSettingsStart->Enable();
+		this->m_textCtrlSettingsEnd->Enable();
+		this->m_checkBoxSettingsNameVisible->Enable();
+		this->m_checkBoxSettingsVisible->Enable();
+		break;
+	case WAYPOINT:
+	case ROUTEPOINT:
+		this->m_textCtrlSetingsDescription->SetBackgroundColour(wxColour(255,255,255));
+		this->m_textCtrlSettingsName->Enable();
+		this->m_textCtrlSetingsDescription->Enable();
+		this->m_textCtrlLatitude->Enable();
+		this->m_textCtrlSettingsLongitude->Enable();
+		this->m_textCtrlDateTime->Enable();
+		this->m_checkBoxSettingsNameVisible->Enable();
+		this->m_checkBoxSettingsVisible->Enable();
+		break;
+	case LINKS: this->m_textCtrlSettingsLinkName->Enable();
+		break;
+	}
+}
+
+void MainDialog::OnCheckBoxVisible( wxCommandEvent& event )
+{
+	myTreeItemElements* data = getElementsItemData(m_treeCtrlLayerElements->GetSelection());
+	data->viz = (event.IsChecked())?_T("1"):_T("0");
+	modified = true;
+}
+
+void MainDialog::OnCheckBoxNameViz( wxCommandEvent& event )
+{
+	myTreeItemElements* data = getElementsItemData(m_treeCtrlLayerElements->GetSelection());
+	data->vizName = (event.IsChecked())?_T("1"):_T("0");
+	modified = true;
+}
+
+void MainDialog::OnTextName( wxCommandEvent& event )
+{
+	myTreeItemElements* data = getElementsItemData(m_treeCtrlLayerElements->GetSelection());
+	if(data->head == ROOT) return;
+
+	data->name = event.GetString();
+	this->m_treeCtrlLayerElements->SetItemText(m_treeCtrlLayerElements->GetSelection(),data->name);
+	modified = true;
+}
+
+void MainDialog::OnTextDescription( wxCommandEvent& event )
+{
+	myTreeItemElements* data = getElementsItemData(m_treeCtrlLayerElements->GetSelection());
+	data->desc = event.GetString();
+	modified = true;
+}
+
+void MainDialog::OnTextLat( wxCommandEvent& event )
+{
+	myTreeItemElements* data = getElementsItemData(m_treeCtrlLayerElements->GetSelection());
+	data->lat = event.GetString();
+	modified = true;
+}
+
+void MainDialog::OnTextLon( wxCommandEvent& event )
+{
+	myTreeItemElements* data = getElementsItemData(m_treeCtrlLayerElements->GetSelection());
+	data->lon = event.GetString();
+	modified = true;
+}
+
+void MainDialog::OnTextDate( wxCommandEvent& event )
+{
+	myTreeItemElements* data = getElementsItemData(m_treeCtrlLayerElements->GetSelection());
+	data->dateTime = event.GetString();
+	modified = true;
+}
+
+void MainDialog::OnTextRouteStart( wxCommandEvent& event )
+{
+	myTreeItemElements* data = getElementsItemData(m_treeCtrlLayerElements->GetSelection());
+	data->start = event.GetString();
+	modified = true;
+}
+
+void MainDialog::OnTextRouteEnd( wxCommandEvent& event )
+{
+	myTreeItemElements* data = getElementsItemData(m_treeCtrlLayerElements->GetSelection());
+	data->end = event.GetString();
+	modified = true;
+}
+
+void MainDialog::OnTextLink( wxCommandEvent& event )
+{
+	myTreeItemElements* data = getElementsItemData(m_treeCtrlLayerElements->GetSelection());
+	data->text = event.GetString();
+	this->m_treeCtrlLayerElements->SetItemText(m_treeCtrlLayerElements->GetSelection(),data->text);
+	modified = true;
+}
 void MainDialog::OnTreeItemActivatedLayerElements( wxTreeEvent& event )
 {
 	wxTreeItemData* it = getElementsItemData(m_treeCtrlLayerElements->GetSelection());
 	if(it)
 	{
 		wxString str = ((myTreeItemElements*)it)->file;
-		::wxLaunchDefaultBrowser(str);
+		if(!str.IsEmpty() && !str.Lower().EndsWith(_T("gpx")))
+			::wxLaunchDefaultBrowser(str);
 	}
 }
 
@@ -1315,7 +1491,8 @@ void MainDialog::fillDirTree(wxTreeCtrl * tree, wxString str, bool tilde)
 	
 	fillDirRecursive(tree,root,str, tilde);
 	
-	tree->ExpandAll();
+	//tree->ExpandAll();
+	tree->Expand(tree->GetRootItem());
 }
 
 void MainDialog::fillDirRecursive(wxTreeCtrl * tree, wxTreeItemId root, wxString path, bool tilde)
@@ -1372,7 +1549,7 @@ wxTreeItemId MainDialog::findTreeItem(wxTreeCtrl* pTreeCtrl, const wxTreeItemId&
 		if(child.IsOk()) child = findTreeItem(pTreeCtrl, child, text, bCaseSensitive, bExactMatch);
 		if(child.IsOk()) return child;
 		item = pTreeCtrl->GetNextSibling(item);
-	} // while(item.IsOk())
+	} 
  
 	return item;
 }

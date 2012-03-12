@@ -18,9 +18,9 @@ class MainDialog : public MainDialogBase
 {
 	protected:
 		// protected event handlers
-		virtual void OnCloseDialog( wxCloseEvent& event );
-		virtual void OnOKClick( wxCommandEvent& event );
-		virtual void OnCancelClick( wxCommandEvent& event );
+		void OnCloseDialog( wxCloseEvent& event );
+		void OnOKClick( wxCommandEvent& event );
+		void OnCancelClick( wxCommandEvent& event );
 		void OnButtonClickLayerDir( wxCommandEvent& event );
 		void OnTreeSelectionChangedLayerTree( wxTreeEvent& event );
 		void OnTreeSelectionChangedElementsTree( wxTreeEvent& event );
@@ -45,6 +45,18 @@ class MainDialog : public MainDialogBase
 		void OnMenuSelectionAddDir( wxCommandEvent& event );
 		void OnListColClickSettings( wxListEvent& event );
 		void OnInit( wxInitDialogEvent& event );
+/////////////// Settings ////////////////
+		void OnCheckBoxVisible( wxCommandEvent& event );
+		void OnCheckBoxNameViz( wxCommandEvent& event );
+		void OnTextName( wxCommandEvent& event );
+		void OnTextDescription( wxCommandEvent& event );
+		void OnTextLat( wxCommandEvent& event );
+		void OnTextLon( wxCommandEvent& event );
+		void OnTextDate( wxCommandEvent& event );
+		void OnTextRouteStart( wxCommandEvent& event );
+		void OnTextRouteEnd( wxCommandEvent& event );
+		void OnTextLink( wxCommandEvent& event );
+
 	public:
 		/** Constructor */
 		MainDialog( wxWindow* parent, LayerManager_pi* p );
@@ -65,12 +77,13 @@ class MainDialog : public MainDialogBase
 		bool textModified;
 		
 		wxString textPath;
+		wxString stdPath;
 		wxString pHome_Locn;
 		wxString pExplorer_Locn;
 
-		wxImageList* imageList;
-		wxArrayString* imageDescription;
-		wxArrayString* imageName;
+		wxImageList*	imageList;
+		wxArrayString*	imageDescription;
+		wxArrayString*	imageName;
 
 		wxTreeItemId 		selectionDirTree, selElementsTree;
 		wxTreeItemId		oldDirTreeItem;		
@@ -87,6 +100,7 @@ private:
 		void setSettingsPage(myTreeItemElements* elem);
 		int getImageName(wxString str);
 		void showHideIconsList();
+		void setSettingsReadonly(int head);
 
 		LayerManager_pi* 	parent;
 		int 			sashPosition;

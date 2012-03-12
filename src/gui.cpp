@@ -97,7 +97,7 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	bSizer14->Fit( m_panel11 );
 	m_notebook1->AddPage( m_panel11, _("Paperbag"), false );
 	
-	bSizer8->Add( m_notebook1, 1, wxEXPAND | wxALL, 5 );
+	bSizer8->Add( m_notebook1, 1, wxALL|wxEXPAND, 0 );
 	
 	m_panel61->SetSizer( bSizer8 );
 	m_panel61->Layout();
@@ -200,7 +200,7 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_staticText1->Wrap( -1 );
 	bSizer16->Add( m_staticText1, 0, wxALL, 0 );
 	
-	m_textCtrlSettingsName = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlSettingsName = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	bSizer16->Add( m_textCtrlSettingsName, 0, wxALL|wxEXPAND, 0 );
 	
 	m_staticText2 = new wxStaticText( m_panel101, wxID_ANY, _("Description"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -222,42 +222,44 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_staticText5->Wrap( -1 );
 	fgSizer1->Add( m_staticText5, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
 	
-	m_textCtrlLatitude = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_textCtrlLatitude = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_PROCESS_ENTER );
+	m_textCtrlLatitude->SetMinSize( wxSize( 150,-1 ) );
+	
 	fgSizer1->Add( m_textCtrlLatitude, 1, wxALL|wxEXPAND, 0 );
 	
 	m_staticText3 = new wxStaticText( m_panel101, wxID_ANY, _("Longitude "), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText3->Wrap( -1 );
 	fgSizer1->Add( m_staticText3, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
 	
-	m_textCtrlSettingsLongitude = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlSettingsLongitude = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	fgSizer1->Add( m_textCtrlSettingsLongitude, 1, wxALL|wxEXPAND, 0 );
 	
 	m_staticText8 = new wxStaticText( m_panel101, wxID_ANY, _("Date / Time"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText8->Wrap( -1 );
 	fgSizer1->Add( m_staticText8, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 	
-	m_textCtrlDateTime = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlDateTime = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	fgSizer1->Add( m_textCtrlDateTime, 1, wxALL|wxEXPAND, 0 );
 	
 	m_staticText9 = new wxStaticText( m_panel101, wxID_ANY, _("Route Start"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText9->Wrap( -1 );
 	fgSizer1->Add( m_staticText9, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
 	
-	m_textCtrlSettingsStart = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlSettingsStart = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	fgSizer1->Add( m_textCtrlSettingsStart, 1, wxALL|wxEXPAND, 0 );
 	
 	m_staticText10 = new wxStaticText( m_panel101, wxID_ANY, _("Route End  "), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText10->Wrap( -1 );
 	fgSizer1->Add( m_staticText10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
 	
-	m_textCtrlSettingsEnd = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlSettingsEnd = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	fgSizer1->Add( m_textCtrlSettingsEnd, 1, wxALL|wxEXPAND, 0 );
 	
 	m_staticText11 = new wxStaticText( m_panel101, wxID_ANY, _("Link-Name"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText11->Wrap( -1 );
 	fgSizer1->Add( m_staticText11, 0, wxALL, 0 );
 	
-	m_textCtrlSettingsLinkName = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrlSettingsLinkName = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	fgSizer1->Add( m_textCtrlSettingsLinkName, 1, wxALL|wxEXPAND, 0 );
 	
 	m_staticText12 = new wxStaticText( m_panel101, wxID_ANY, _("File"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -315,9 +317,7 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel91->SetSizer( bSizer121 );
 	m_panel91->Layout();
 	bSizer121->Fit( m_panel91 );
-
 	m_splitter1->SplitVertically( m_panel61, m_panel91, 240 );
-
 	bSizer2->Add( m_splitter1, 1, wxEXPAND, 5 );
 	
 	mainSizer->Add( bSizer2, 1, wxEXPAND, 5 );
@@ -364,6 +364,16 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_treeCtrlLayerElements->Connect( wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler( MainDialogBase::OnTreeSelectionChangedElementsTree ), NULL, this );
 	this->Connect( m_menuItemAddText->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogBase::OnMenuSeletionAddText ) );
 	this->Connect( m_menuItemElementsDelete->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogBase::OnMenuSelectionElementsDelete ) );
+	m_checkBoxSettingsVisible->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MainDialogBase::OnCheckBoxVisible ), NULL, this );
+	m_checkBoxSettingsNameVisible->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MainDialogBase::OnCheckBoxNameViz ), NULL, this );
+	m_textCtrlSettingsName->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextName ), NULL, this );
+	m_textCtrlSetingsDescription->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextDescription ), NULL, this );
+	m_textCtrlLatitude->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextLat ), NULL, this );
+	m_textCtrlSettingsLongitude->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextLon ), NULL, this );
+	m_textCtrlDateTime->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextDate ), NULL, this );
+	m_textCtrlSettingsStart->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextRouteStart ), NULL, this );
+	m_textCtrlSettingsEnd->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextRouteEnd ), NULL, this );
+	m_textCtrlSettingsLinkName->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextLink ), NULL, this );
 	m_listCtrlSettingsIcons->Connect( wxEVT_COMMAND_LIST_COL_CLICK, wxListEventHandler( MainDialogBase::OnListColClickSettings ), NULL, this );
 	m_listCtrlSettingsIcons->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( MainDialogBase::OnItemActivatedIconsList ), NULL, this );
 	m_sdbSizerCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogBase::OnCancelClick ), NULL, this );
@@ -398,6 +408,16 @@ MainDialogBase::~MainDialogBase()
 	m_treeCtrlLayerElements->Disconnect( wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler( MainDialogBase::OnTreeSelectionChangedElementsTree ), NULL, this );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogBase::OnMenuSeletionAddText ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogBase::OnMenuSelectionElementsDelete ) );
+	m_checkBoxSettingsVisible->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MainDialogBase::OnCheckBoxVisible ), NULL, this );
+	m_checkBoxSettingsNameVisible->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MainDialogBase::OnCheckBoxNameViz ), NULL, this );
+	m_textCtrlSettingsName->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextName ), NULL, this );
+	m_textCtrlSetingsDescription->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextDescription ), NULL, this );
+	m_textCtrlLatitude->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextLat ), NULL, this );
+	m_textCtrlSettingsLongitude->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextLon ), NULL, this );
+	m_textCtrlDateTime->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextDate ), NULL, this );
+	m_textCtrlSettingsStart->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextRouteStart ), NULL, this );
+	m_textCtrlSettingsEnd->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextRouteEnd ), NULL, this );
+	m_textCtrlSettingsLinkName->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( MainDialogBase::OnTextLink ), NULL, this );
 	m_listCtrlSettingsIcons->Disconnect( wxEVT_COMMAND_LIST_COL_CLICK, wxListEventHandler( MainDialogBase::OnListColClickSettings ), NULL, this );
 	m_listCtrlSettingsIcons->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( MainDialogBase::OnItemActivatedIconsList ), NULL, this );
 	m_sdbSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogBase::OnCancelClick ), NULL, this );

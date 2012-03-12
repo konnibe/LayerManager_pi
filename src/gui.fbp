@@ -376,7 +376,7 @@
                                 <property name="resize">Resizable</property>
                                 <property name="row"></property>
                                 <property name="sashgravity">0.0</property>
-                                <property name="sashpos">220</property>
+                                <property name="sashpos">240</property>
                                 <property name="sashsize">-1</property>
                                 <property name="show">1</property>
                                 <property name="size"></property>
@@ -504,8 +504,8 @@
                                             <property name="orient">wxHORIZONTAL</property>
                                             <property name="permission">none</property>
                                             <object class="sizeritem" expanded="1">
-                                                <property name="border">5</property>
-                                                <property name="flag">wxEXPAND | wxALL</property>
+                                                <property name="border">0</property>
+                                                <property name="flag">wxALL|wxEXPAND</property>
                                                 <property name="proportion">1</property>
                                                 <object class="wxNotebook" expanded="1">
                                                     <property name="BottomDockable">1</property>
@@ -521,7 +521,7 @@
                                                     <property name="center_pane">0</property>
                                                     <property name="close_button">1</property>
                                                     <property name="context_help"></property>
-                                                    <property name="context_menu">1</property>
+                                                    <property name="context_menu">0</property>
                                                     <property name="default_pane">0</property>
                                                     <property name="dock">Dock</property>
                                                     <property name="dock_fixed">0</property>
@@ -552,7 +552,7 @@
                                                     <property name="resize">Resizable</property>
                                                     <property name="row"></property>
                                                     <property name="show">1</property>
-                                                    <property name="size"></property>
+                                                    <property name="size">240,-1</property>
                                                     <property name="style"></property>
                                                     <property name="subclass"></property>
                                                     <property name="toolbar_pane">0</property>
@@ -593,7 +593,7 @@
                                                         <property name="bitmap"></property>
                                                         <property name="label">Layer</property>
                                                         <property name="select">1</property>
-                                                        <object class="wxPanel" expanded="1">
+                                                        <object class="wxPanel" expanded="0">
                                                             <property name="BottomDockable">1</property>
                                                             <property name="LeftDockable">1</property>
                                                             <property name="RightDockable">1</property>
@@ -671,16 +671,16 @@
                                                             <event name="OnSetFocus"></event>
                                                             <event name="OnSize"></event>
                                                             <event name="OnUpdateUI"></event>
-                                                            <object class="wxBoxSizer" expanded="1">
+                                                            <object class="wxBoxSizer" expanded="0">
                                                                 <property name="minimum_size"></property>
                                                                 <property name="name">bSizer3</property>
                                                                 <property name="orient">wxVERTICAL</property>
                                                                 <property name="permission">none</property>
-                                                                <object class="sizeritem" expanded="1">
+                                                                <object class="sizeritem" expanded="0">
                                                                     <property name="border">0</property>
                                                                     <property name="flag">wxALL|wxEXPAND</property>
                                                                     <property name="proportion">1</property>
-                                                                    <object class="wxTreeCtrl" expanded="1">
+                                                                    <object class="wxTreeCtrl" expanded="0">
                                                                         <property name="BottomDockable">1</property>
                                                                         <property name="LeftDockable">1</property>
                                                                         <property name="RightDockable">1</property>
@@ -780,7 +780,7 @@
                                                                         <event name="OnTreeSetInfo"></event>
                                                                         <event name="OnTreeStateImageClick"></event>
                                                                         <event name="OnUpdateUI"></event>
-                                                                        <object class="wxMenu" expanded="1">
+                                                                        <object class="wxMenu" expanded="0">
                                                                             <property name="label">MyMenu</property>
                                                                             <property name="name">m_menuRightClickDirTree</property>
                                                                             <property name="permission">protected</property>
@@ -824,7 +824,7 @@
                                                         <property name="bitmap"></property>
                                                         <property name="label">Explorer</property>
                                                         <property name="select">0</property>
-                                                        <object class="wxPanel" expanded="1">
+                                                        <object class="wxPanel" expanded="0">
                                                             <property name="BottomDockable">1</property>
                                                             <property name="LeftDockable">1</property>
                                                             <property name="RightDockable">1</property>
@@ -902,16 +902,16 @@
                                                             <event name="OnSetFocus"></event>
                                                             <event name="OnSize"></event>
                                                             <event name="OnUpdateUI"></event>
-                                                            <object class="wxBoxSizer" expanded="1">
+                                                            <object class="wxBoxSizer" expanded="0">
                                                                 <property name="minimum_size"></property>
                                                                 <property name="name">bSizer131</property>
                                                                 <property name="orient">wxVERTICAL</property>
                                                                 <property name="permission">none</property>
-                                                                <object class="sizeritem" expanded="1">
+                                                                <object class="sizeritem" expanded="0">
                                                                     <property name="border">0</property>
                                                                     <property name="flag">wxALL|wxEXPAND</property>
                                                                     <property name="proportion">1</property>
-                                                                    <object class="wxTreeCtrl" expanded="1">
+                                                                    <object class="wxTreeCtrl" expanded="0">
                                                                         <property name="BottomDockable">1</property>
                                                                         <property name="LeftDockable">1</property>
                                                                         <property name="RightDockable">1</property>
@@ -2230,7 +2230,7 @@
                                                                                                     <property name="pane_border">1</property>
                                                                                                     <property name="pane_position"></property>
                                                                                                     <property name="pane_size"></property>
-                                                                                                    <property name="permission">protected</property>
+                                                                                                    <property name="permission">public</property>
                                                                                                     <property name="pin_button">1</property>
                                                                                                     <property name="pos"></property>
                                                                                                     <property name="position"></property>
@@ -2801,7 +2801,7 @@
                                                                                                                         <property name="window_name"></property>
                                                                                                                         <property name="window_style"></property>
                                                                                                                         <event name="OnChar"></event>
-                                                                                                                        <event name="OnCheckBox"></event>
+                                                                                                                        <event name="OnCheckBox">OnCheckBoxVisible</event>
                                                                                                                         <event name="OnEnterWindow"></event>
                                                                                                                         <event name="OnEraseBackground"></event>
                                                                                                                         <event name="OnKeyDown"></event>
@@ -2889,7 +2889,7 @@
                                                                                                                         <property name="window_name"></property>
                                                                                                                         <property name="window_style"></property>
                                                                                                                         <event name="OnChar"></event>
-                                                                                                                        <event name="OnCheckBox"></event>
+                                                                                                                        <event name="OnCheckBox">OnCheckBoxNameViz</event>
                                                                                                                         <event name="OnEnterWindow"></event>
                                                                                                                         <event name="OnEraseBackground"></event>
                                                                                                                         <event name="OnKeyDown"></event>
@@ -3053,7 +3053,7 @@
                                                                                                                 <property name="row"></property>
                                                                                                                 <property name="show">1</property>
                                                                                                                 <property name="size"></property>
-                                                                                                                <property name="style"></property>
+                                                                                                                <property name="style">wxTE_PROCESS_ENTER</property>
                                                                                                                 <property name="subclass"></property>
                                                                                                                 <property name="toolbar_pane">0</property>
                                                                                                                 <property name="tooltip"></property>
@@ -3087,7 +3087,7 @@
                                                                                                                 <event name="OnRightUp"></event>
                                                                                                                 <event name="OnSetFocus"></event>
                                                                                                                 <event name="OnSize"></event>
-                                                                                                                <event name="OnText"></event>
+                                                                                                                <event name="OnText">OnTextName</event>
                                                                                                                 <event name="OnTextEnter"></event>
                                                                                                                 <event name="OnTextMaxLen"></event>
                                                                                                                 <event name="OnTextURL"></event>
@@ -3265,7 +3265,7 @@
                                                                                                                 <event name="OnRightUp"></event>
                                                                                                                 <event name="OnSetFocus"></event>
                                                                                                                 <event name="OnSize"></event>
-                                                                                                                <event name="OnText"></event>
+                                                                                                                <event name="OnText">OnTextDescription</event>
                                                                                                                 <event name="OnTextEnter"></event>
                                                                                                                 <event name="OnTextMaxLen"></event>
                                                                                                                 <event name="OnTextURL"></event>
@@ -3420,7 +3420,7 @@
                                                                                                                                 <property name="maxlength">0</property>
                                                                                                                                 <property name="min_size"></property>
                                                                                                                                 <property name="minimize_button">0</property>
-                                                                                                                                <property name="minimum_size"></property>
+                                                                                                                                <property name="minimum_size">150,-1</property>
                                                                                                                                 <property name="moveable">1</property>
                                                                                                                                 <property name="name">m_textCtrlLatitude</property>
                                                                                                                                 <property name="pane_border">1</property>
@@ -3434,7 +3434,7 @@
                                                                                                                                 <property name="row"></property>
                                                                                                                                 <property name="show">1</property>
                                                                                                                                 <property name="size">-1,-1</property>
-                                                                                                                                <property name="style"></property>
+                                                                                                                                <property name="style">wxTE_PROCESS_ENTER</property>
                                                                                                                                 <property name="subclass"></property>
                                                                                                                                 <property name="toolbar_pane">0</property>
                                                                                                                                 <property name="tooltip"></property>
@@ -3468,7 +3468,7 @@
                                                                                                                                 <event name="OnRightUp"></event>
                                                                                                                                 <event name="OnSetFocus"></event>
                                                                                                                                 <event name="OnSize"></event>
-                                                                                                                                <event name="OnText"></event>
+                                                                                                                                <event name="OnText">OnTextLat</event>
                                                                                                                                 <event name="OnTextEnter"></event>
                                                                                                                                 <event name="OnTextMaxLen"></event>
                                                                                                                                 <event name="OnTextURL"></event>
@@ -3612,7 +3612,7 @@
                                                                                                                                 <property name="row"></property>
                                                                                                                                 <property name="show">1</property>
                                                                                                                                 <property name="size"></property>
-                                                                                                                                <property name="style"></property>
+                                                                                                                                <property name="style">wxTE_PROCESS_ENTER</property>
                                                                                                                                 <property name="subclass"></property>
                                                                                                                                 <property name="toolbar_pane">0</property>
                                                                                                                                 <property name="tooltip"></property>
@@ -3646,7 +3646,7 @@
                                                                                                                                 <event name="OnRightUp"></event>
                                                                                                                                 <event name="OnSetFocus"></event>
                                                                                                                                 <event name="OnSize"></event>
-                                                                                                                                <event name="OnText"></event>
+                                                                                                                                <event name="OnText">OnTextLon</event>
                                                                                                                                 <event name="OnTextEnter"></event>
                                                                                                                                 <event name="OnTextMaxLen"></event>
                                                                                                                                 <event name="OnTextURL"></event>
@@ -3790,7 +3790,7 @@
                                                                                                                                 <property name="row"></property>
                                                                                                                                 <property name="show">1</property>
                                                                                                                                 <property name="size"></property>
-                                                                                                                                <property name="style"></property>
+                                                                                                                                <property name="style">wxTE_PROCESS_ENTER</property>
                                                                                                                                 <property name="subclass"></property>
                                                                                                                                 <property name="toolbar_pane">0</property>
                                                                                                                                 <property name="tooltip"></property>
@@ -3824,7 +3824,7 @@
                                                                                                                                 <event name="OnRightUp"></event>
                                                                                                                                 <event name="OnSetFocus"></event>
                                                                                                                                 <event name="OnSize"></event>
-                                                                                                                                <event name="OnText"></event>
+                                                                                                                                <event name="OnText">OnTextDate</event>
                                                                                                                                 <event name="OnTextEnter"></event>
                                                                                                                                 <event name="OnTextMaxLen"></event>
                                                                                                                                 <event name="OnTextURL"></event>
@@ -3968,7 +3968,7 @@
                                                                                                                                 <property name="row"></property>
                                                                                                                                 <property name="show">1</property>
                                                                                                                                 <property name="size"></property>
-                                                                                                                                <property name="style"></property>
+                                                                                                                                <property name="style">wxTE_PROCESS_ENTER</property>
                                                                                                                                 <property name="subclass"></property>
                                                                                                                                 <property name="toolbar_pane">0</property>
                                                                                                                                 <property name="tooltip"></property>
@@ -4002,7 +4002,7 @@
                                                                                                                                 <event name="OnRightUp"></event>
                                                                                                                                 <event name="OnSetFocus"></event>
                                                                                                                                 <event name="OnSize"></event>
-                                                                                                                                <event name="OnText"></event>
+                                                                                                                                <event name="OnText">OnTextRouteStart</event>
                                                                                                                                 <event name="OnTextEnter"></event>
                                                                                                                                 <event name="OnTextMaxLen"></event>
                                                                                                                                 <event name="OnTextURL"></event>
@@ -4146,7 +4146,7 @@
                                                                                                                                 <property name="row"></property>
                                                                                                                                 <property name="show">1</property>
                                                                                                                                 <property name="size"></property>
-                                                                                                                                <property name="style"></property>
+                                                                                                                                <property name="style">wxTE_PROCESS_ENTER</property>
                                                                                                                                 <property name="subclass"></property>
                                                                                                                                 <property name="toolbar_pane">0</property>
                                                                                                                                 <property name="tooltip"></property>
@@ -4180,7 +4180,7 @@
                                                                                                                                 <event name="OnRightUp"></event>
                                                                                                                                 <event name="OnSetFocus"></event>
                                                                                                                                 <event name="OnSize"></event>
-                                                                                                                                <event name="OnText"></event>
+                                                                                                                                <event name="OnText">OnTextRouteEnd</event>
                                                                                                                                 <event name="OnTextEnter"></event>
                                                                                                                                 <event name="OnTextMaxLen"></event>
                                                                                                                                 <event name="OnTextURL"></event>
@@ -4324,7 +4324,7 @@
                                                                                                                                 <property name="row"></property>
                                                                                                                                 <property name="show">1</property>
                                                                                                                                 <property name="size"></property>
-                                                                                                                                <property name="style"></property>
+                                                                                                                                <property name="style">wxTE_PROCESS_ENTER</property>
                                                                                                                                 <property name="subclass"></property>
                                                                                                                                 <property name="toolbar_pane">0</property>
                                                                                                                                 <property name="tooltip"></property>
@@ -4358,7 +4358,7 @@
                                                                                                                                 <event name="OnRightUp"></event>
                                                                                                                                 <event name="OnSetFocus"></event>
                                                                                                                                 <event name="OnSize"></event>
-                                                                                                                                <event name="OnText"></event>
+                                                                                                                                <event name="OnText">OnTextLink</event>
                                                                                                                                 <event name="OnTextEnter"></event>
                                                                                                                                 <event name="OnTextMaxLen"></event>
                                                                                                                                 <event name="OnTextURL"></event>

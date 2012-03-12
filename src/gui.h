@@ -63,7 +63,6 @@ class MainDialogBase : public wxDialog
 		wxPanel* m_panel9;
 		wxPanel* m_panel5;
 		wxSplitterWindow* m_splitter31;
-		wxPanel* m_panel101;
 		wxStaticText* m_staticText51;
 		wxStaticLine* m_staticline2;
 		wxStaticText* m_staticText1;
@@ -107,6 +106,16 @@ class MainDialogBase : public wxDialog
 		virtual void OnTreeSelectionChangedElementsTree( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnMenuSeletionAddText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnMenuSelectionElementsDelete( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCheckBoxVisible( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCheckBoxNameViz( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTextName( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTextDescription( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTextLat( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTextLon( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTextDate( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTextRouteStart( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTextRouteEnd( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTextLink( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnListColClickSettings( wxListEvent& event ) { event.Skip(); }
 		virtual void OnItemActivatedIconsList( wxListEvent& event ) { event.Skip(); }
 		virtual void OnCancelClick( wxCommandEvent& event ) { event.Skip(); }
@@ -122,6 +131,7 @@ class MainDialogBase : public wxDialog
 		wxTreeCtrl* m_treeCtrlLayerElements;
 		wxMenuItem* m_menuItemAddText;
 		wxNotebook* m_notebook2;
+		wxPanel* m_panel101;
 		wxStaticText* m_staticTextSettingsType;
 		wxStaticBitmap* m_bitmap1;
 		wxStaticText* m_staticText13;
@@ -145,7 +155,7 @@ class MainDialogBase : public wxDialog
 		
 		void m_splitter1OnIdle( wxIdleEvent& )
 		{
-			m_splitter1->SetSashPosition( 220 );
+			m_splitter1->SetSashPosition( 240 );
 			m_splitter1->Disconnect( wxEVT_IDLE, wxIdleEventHandler( MainDialogBase::m_splitter1OnIdle ), NULL, this );
 		}
 		

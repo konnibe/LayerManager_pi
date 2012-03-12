@@ -37,11 +37,11 @@
 #endif //precompiled headers
 
 #define     PLUGIN_VERSION_MAJOR    0
-#define     PLUGIN_VERSION_MINOR    2
+#define     PLUGIN_VERSION_MINOR    3
 
 #define     MY_API_VERSION_MAJOR    1
-#define     MY_API_VERSION_MINOR    5
-
+//#define     MY_API_VERSION_MINOR    5  // for OpenCPN 2.5
+#define     MY_API_VERSION_MINOR    6  // for OpenCPN 2.6.xxxx Beta
 #include "../../../include/ocpn_plugin.h"
 #include "MainDialog.h"
 
@@ -52,10 +52,10 @@ class MainDialog;
 //----------------------------------------------------------------------------------------------------------
 
 
-class LayerManager_pi : public opencpn_plugin
+class LayerManager_pi : public opencpn_plugin_16
 {
 public:
-      LayerManager_pi(void *ppimgr):opencpn_plugin(ppimgr){}
+      LayerManager_pi(void *ppimgr):opencpn_plugin_16(ppimgr){}
 
 //    The required PlugIn Methods
       int Init(void);
