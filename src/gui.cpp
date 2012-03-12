@@ -222,7 +222,11 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_staticText5->Wrap( -1 );
 	fgSizer1->Add( m_staticText5, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
 	
+<<<<<<< HEAD
 	m_textCtrlLatitude = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_PROCESS_ENTER );
+=======
+	m_textCtrlLatitude = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), 0 );
+>>>>>>> origin/master
 	m_textCtrlLatitude->SetMinSize( wxSize( 150,-1 ) );
 	
 	fgSizer1->Add( m_textCtrlLatitude, 1, wxALL|wxEXPAND, 0 );

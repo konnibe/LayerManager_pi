@@ -40,8 +40,13 @@
 #define     PLUGIN_VERSION_MINOR    3
 
 #define     MY_API_VERSION_MAJOR    1
+<<<<<<< HEAD
 //#define     MY_API_VERSION_MINOR    5  // for OpenCPN 2.5
 #define     MY_API_VERSION_MINOR    6  // for OpenCPN 2.6.xxxx Beta
+=======
+#define     MY_API_VERSION_MINOR    5  // for OpenCPN 2.5
+//#define     MY_API_VERSION_MINOR    6  // for OpenCPN 2.6.xxxx Beta
+>>>>>>> origin/master
 #include "../../../include/ocpn_plugin.h"
 #include "MainDialog.h"
 
