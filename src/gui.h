@@ -145,7 +145,7 @@ class MainDialogBase : public wxDialog
 		
 		void m_splitter1OnIdle( wxIdleEvent& )
 		{
-			m_splitter1->SetSashPosition( 220 );
+			m_splitter1->SetSashPosition( 240 );
 			m_splitter1->Disconnect( wxEVT_IDLE, wxIdleEventHandler( MainDialogBase::m_splitter1OnIdle ), NULL, this );
 		}
 		

@@ -303,7 +303,12 @@ void MainDialog::createImageList()
 
 	wxListItem col1;
 	col1.SetColumn(1);
+#ifdef __WXMSW__
+	col1.SetWidth(130);
+#endif
+#ifdef __WXGTK__
 	col1.SetWidth(150);
+#endif
 	col1.SetText(_("Description"));
 	this->m_listCtrlSettingsIcons->InsertColumn(1,col1);
 

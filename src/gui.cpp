@@ -97,7 +97,7 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	bSizer14->Fit( m_panel11 );
 	m_notebook1->AddPage( m_panel11, _("Paperbag"), false );
 	
-	bSizer8->Add( m_notebook1, 1, wxEXPAND | wxALL, 5 );
+	bSizer8->Add( m_notebook1, 1, wxALL|wxEXPAND, 0 );
 	
 	m_panel61->SetSizer( bSizer8 );
 	m_panel61->Layout();
@@ -223,6 +223,8 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer1->Add( m_staticText5, 0, wxALL|wxALIGN_CENTER_VERTICAL, 0 );
 	
 	m_textCtrlLatitude = new wxTextCtrl( m_panel101, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_textCtrlLatitude->SetMinSize( wxSize( 150,-1 ) );
+	
 	fgSizer1->Add( m_textCtrlLatitude, 1, wxALL|wxEXPAND, 0 );
 	
 	m_staticText3 = new wxStaticText( m_panel101, wxID_ANY, _("Longitude "), wxDefaultPosition, wxDefaultSize, 0 );
@@ -315,9 +317,7 @@ MainDialogBase::MainDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel91->SetSizer( bSizer121 );
 	m_panel91->Layout();
 	bSizer121->Fit( m_panel91 );
-
 	m_splitter1->SplitVertically( m_panel61, m_panel91, 240 );
-
 	bSizer2->Add( m_splitter1, 1, wxEXPAND, 5 );
 	
 	mainSizer->Add( bSizer2, 1, wxEXPAND, 5 );
